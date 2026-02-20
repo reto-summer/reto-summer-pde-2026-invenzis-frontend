@@ -1,6 +1,10 @@
 import { useState } from 'react';
 
-export default function Sidebar() {
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+export default function Sidebar({ onClose }: SidebarProps = {}) {
     const [mail, setMail] = useState('');
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
@@ -25,9 +29,23 @@ export default function Sidebar() {
 
     return (
         <aside className="w-80 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 px-6 py-8 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-700/50">
-            <h2 className="text-3xl font-heading font-bold text-white mb-2 tracking-tight">
-                Configuraciones
-            </h2>
+            <div className="flex items-center gap-3 mb-2">
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        className="text-white hover:text-slate-300 transition-colors"
+                        aria-label="Cerrar configuraciones"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m12 19-7-7 7-7" />
+                            <path d="M19 12H5" />
+                        </svg>
+                    </button>
+                )}
+                <h2 className="text-3xl font-heading font-bold text-white tracking-tight">
+                    Configuraciones
+                </h2>
+            </div>
 
             <div className="flex-1 flex flex-col gap-0 overflow-y-auto pr-2">
                 {/* Mail */}
