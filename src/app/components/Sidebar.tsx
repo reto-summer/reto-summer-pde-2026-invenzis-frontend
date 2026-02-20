@@ -26,12 +26,12 @@ export default function Sidebar() {
     return (
         <aside className="w-80 h-screen bg-white border-r border-slate-200 px-6 py-4 flex flex-col">
             <h2 className="text-xl font-heading font-semibold text-slate-900 mb-6">
-                Configuraciones
+                Configuracion
             </h2>
 
             <div className="flex-1 flex flex-col gap-4 overflow-y-auto">
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="mail" className="text-sm font-medium text-slate-700">Mail</label>
+                    <label htmlFor="mail" className="text-sm font-medium text-slate-700">Ingrese su mail</label>
                     <input
                         id="mail"
                         type="email"
