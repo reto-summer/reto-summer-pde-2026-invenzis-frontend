@@ -2,7 +2,11 @@ import type { Bid } from "../types/Bid";
 
 interface BidCardProps {
   bid: Bid;
-  onClick?: () => void;
+}
+
+function getHoursToClose(fechaCierre: string): number {
+  const diff = new Date(fechaCierre).getTime() - Date.now();
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60)));
 }
 
 function getUrgencyStyle(hours: number): string {
@@ -17,46 +21,48 @@ function getUrgencyLabel(hours: number): string {
   return `${days}d restantes`;
 }
 
-export function BidCard({ bid, onClick }: BidCardProps) {
+export function BidCard({ bid }: BidCardProps) {
+  const hoursToClose = getHoursToClose(bid.fecha_cierre);
+
   return (
-    <div
-      onClick={onClick}
-      className="bg-white border border-slate-200 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md hover:border-blue-300"
+    <a
+      href={bid.link}
+
+      className="block bg-white border border-slate-200 rounded-lg p-4 transition-all hover:shadow-md hover:border-blue-300"
     >
-      {/* Fila superior: badge de urgencia + tipo y número */}
+      {/* Fila superior: badge de urgencia + familia */}
       <div className="flex items-center gap-3 mb-3">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getUrgencyStyle(bid.timeToClose)}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getUrgencyStyle(hoursToClose)}`}
         >
-          ⏱ {getUrgencyLabel(bid.timeToClose)}
+          ⏱ {getUrgencyLabel(hoursToClose)}
         </span>
-        <span className="text-sm font-semibold text-slate-800">
-          {bid.type} {bid.number}
+        <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+          {bid.familia.nombre}
         </span>
       </div>
 
-      {/* Institución */}
-      <p className="text-sm text-blue-600 mb-2">
-        {bid.institution}
-        {bid.department && ` | ${bid.department}`}
+      {/* Título */}
+      <p className="text-sm font-semibold text-slate-800 mb-2 line-clamp-2">
+        {bid.title}
       </p>
 
       {/* Descripción */}
-      <p className="text-sm text-slate-700 leading-relaxed line-clamp-3 mb-3">
+      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 mb-3">
         {bid.description}
       </p>
 
-      {/* Footer: fecha de cierre + apertura electrónica */}
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-600">
-          <span className="font-semibold">Cierre:</span> {bid.deadline}
+      {/* Footer: fecha de cierre + publicación */}
+      <div className="flex items-center justify-between text-xs text-slate-500">
+        <p>
+          <span className="font-semibold">Cierre:</span>{" "}
+          {new Date(bid.fecha_cierre).toLocaleDateString("es-AR")}
         </p>
-        {bid.aperturaElectronica && (
-          <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
-            Apertura Electrónica
-          </span>
-        )}
+        <p>
+          <span className="font-semibold">Publicación:</span>{" "}
+          {new Date(bid.fecha_publicacion).toLocaleDateString("es-AR")}
+        </p>
       </div>
-    </div>
+    </a>
   );
 }
