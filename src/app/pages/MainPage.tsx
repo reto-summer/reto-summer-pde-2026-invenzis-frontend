@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Header from "../../components/header";
+import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
 import { BidCard } from "../components/BidCard";
 import type { Bid } from "../types/Bid";
