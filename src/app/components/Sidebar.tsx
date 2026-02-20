@@ -1,6 +1,9 @@
 import { useState } from 'react';
 
 export default function Sidebar() {
+    const [mail, setMail] = useState('');
+    const [fechaInicio, setFechaInicio] = useState('');
+    const [fechaFin, setFechaFin] = useState('');
     const [familia, setFamilia] = useState('');
     const [subfamilia, setSubfamilia] = useState('');
     const [clase, setClase] = useState('');
@@ -27,6 +30,37 @@ export default function Sidebar() {
             </h2>
 
             <div className="flex-1 flex flex-col gap-4 overflow-y-auto">
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="mail" className="text-sm font-medium text-slate-700">Mail</label>
+                    <input
+                        id="mail"
+                        type="email"
+                        value={mail}
+                        onChange={e => setMail(e.target.value)}
+                        placeholder="Ingrese el mail"
+                        className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                    />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="fechaInicio" className="text-sm font-medium text-slate-700">Fecha de inicio</label>
+                    <input
+                        id="fechaInicio"
+                        type="date"
+                        value={fechaInicio}
+                        onChange={e => setFechaInicio(e.target.value)}
+                        className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                    />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="fechaFin" className="text-sm font-medium text-slate-700">Fecha de fin</label>
+                    <input
+                        id="fechaFin"
+                        type="date"
+                        value={fechaFin}
+                        onChange={e => setFechaFin(e.target.value)}
+                        className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
+                    />
+                </div>
                 <div className="flex flex-col gap-2">
                     <label
                         htmlFor="familia"
@@ -119,7 +153,7 @@ export default function Sidebar() {
                     onClick={handleApply}
                     className="mt-4 px-4 py-2.5 bg-blue-600 text-white text-base font-medium rounded-lg transition-all hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
                 >
-                    Aplicar
+                    Filtrar
                 </button>
             </div>
         </aside>
