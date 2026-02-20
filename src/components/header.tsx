@@ -29,7 +29,7 @@ export default function Header({
       </div>
 
       {/* Right section */}
-      <div className="flex flex-1 flex-col justify-center px-6">
+      <div className="flex flex-1 flex-col items-end justify-center px-6">
         <h1 className="text-xl font-bold text-gray-900">{title}</h1>
         <p className="text-xs text-gray-500">{subtitle}</p>
       </div>
