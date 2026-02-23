@@ -13,9 +13,8 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header
-      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white border-b border-gray-200 transition-all duration-300 ${
-        sidebarOpen ? "left-80" : "left-0"
-      }`}
+      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white border-b border-gray-200 transition-all duration-300 ${sidebarOpen ? 'left-[400px]' : 'left-0'
+        }`}
     >
       {/* Left section */}
       <div className="flex w-[260px] shrink-0 items-center gap-3 border-r border-gray-200 px-4">
