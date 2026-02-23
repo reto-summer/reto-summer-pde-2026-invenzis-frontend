@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 export default function Header({
-  title = "Nuevas Oportunidades",
+  title = "Radar de Licitaciones",
   subtitle = "8 licitaciones disponibles",
   onSettingsClick,
   sidebarOpen = false,
@@ -18,7 +18,7 @@ export default function Header({
       }`}
     >
       {/* Left section */}
-      <div className="flex w-[55px] shrink-0 items-center gap-3 border-r border-gray-200 px-4">
+      <div className="flex w-[55px] shrink-0 items-center justify-center border-r border-gray-200 px-3">
 
         {/* Settings button — only visible when sidebar is closed */}
         {!sidebarOpen && onSettingsClick && (
@@ -43,44 +43,23 @@ export default function Header({
             </svg>
           </button>
         )}
-
-        {/* Logo placeholder */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-gray-300 text-[10px] font-medium text-gray-400">
-          LOGO
-        </div>
-
-        {/* Brand text */}
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm font-bold text-gray-900">Invenzis</span>
-          <span className="text-xs text-gray-500">Radar de Licitaciones</span>
-        </div>
       </div>
 
       {/* Right section */}
       <div className="flex flex-1 items-center px-6">
 
-        {/* Logo + Brand */}
-        <div className="flex items-center gap-3">
-          {/* Logo */}
-          <img
-            src="/LogoInvenzis.jpg"
-            alt="Logo Invenzis"
-            className="h-15 w-18 shrink-0 rounded object-contain"
-          />
-
-          {/* Brand text */}
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold text-gray-900">Invenzis</span>
-            <span className="text-xs text-gray-500">Radar de Licitaciones</span>
-          </div>
-        </div>
+        {/* Logo */}
+        <img
+          src="/LogoInvenzis.jpg"
+          alt="Logo Invenzis"
+          className="h-12 w-15 shrink-0 rounded object-contain"
+        />
 
         {/* Title + Subtitle pushed to far right */}
         <div className="ml-auto flex flex-col items-end">
           <h1 className="text-xl font-bold text-gray-900">{title}</h1>
           <p className="text-xs text-gray-500">{subtitle}</p>
         </div>
-
       </div>
     </header>
   );
