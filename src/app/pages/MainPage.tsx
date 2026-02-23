@@ -1,63 +1,21 @@
-import { useState } from "react";
+import { useAppContext } from "../hooks/useAppContext";
+import { useBids } from "../hooks/useBids";
+import { DEFAULT_FILTERS } from "../types/filters";
 import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
 import { BidCard } from "../components/BidCard";
 import { Filters } from "../components/Filters";
-import type { Bid } from "../types/Bid";
-import type { FiltersState } from "../types/filters";
-import { DEFAULT_FILTERS } from "../types/filters";
+import { BidCardSkeleton } from "../components/ui/BidCardSkeleton";
+import { ErrorMessage } from "../components/ui/ErrorMessage";
+import { EmptyState } from "../components/ui/EmptyState";
 
-interface MainPageProps {
-  bids?: Bid[];
-}
+export default function MainPage() {
+  const { sidebarOpen, setSidebarOpen, filters, setFilters } = useAppContext();
+  const { filteredBids, loading, error } = useBids();
 
-export default function MainPage({ bids = [] }: MainPageProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
-
-  const filteredBids = bids.filter((bid) => {
-    // Filtro por búsqueda de texto
-    const matchesSearch =
-      filters.search === "" ||
-      bid.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-      bid.description.toLowerCase().includes(filters.search.toLowerCase());
-
-    // Filtro por tipo de licitación
-    const matchesType =
-      filters.tenderTypes.length === 0 ||
-      filters.tenderTypes.some((type) => {
-        switch (type) {
-          case "licitacion_publica":
-            return bid.title.includes("Licitación Pública");
-          case "compra_directa":
-            return bid.title.includes("Compra Directa");
-          case "licitacion_abreviada":
-            return bid.title.includes("Licitación Abreviada");
-          default:
-            return false;
-        }
-      });
-
-    // Filtro por rango de tiempo
-    const hours =
-      (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
-    const matchesTime =
-      filters.dateRanges.length === 0 ||
-      filters.dateRanges.some((range) => {
-        switch (range) {
-          case "under_7":
-            return hours <= 168; // 7 días
-          case "7_15":
-            return hours > 168 && hours <= 360; // 7-15 días
-          case "over_15":
-            return hours > 360; // >15 días
-          default:
-            return false;
-        }
-      });
-
-    return matchesSearch && matchesType && matchesTime;
-  });
+  function handleClearFilters() {
+    setFilters(DEFAULT_FILTERS);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -84,9 +42,19 @@ export default function MainPage({ bids = [] }: MainPageProps) {
 
           {/* Bid cards list */}
           <div className="p-4 flex flex-col gap-3">
-            {filteredBids.map((bid) => (
-              <BidCard key={bid.id_licitacion} bid={bid} />
-            ))}
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <BidCardSkeleton key={i} />
+              ))
+            ) : error ? (
+              <ErrorMessage message={error} />
+            ) : filteredBids.length === 0 ? (
+              <EmptyState onClear={handleClearFilters} />
+            ) : (
+              filteredBids.map((bid) => (
+                <BidCard key={bid.id_licitacion} bid={bid} />
+              ))
+            )}
           </div>
         </div>
       </div>
