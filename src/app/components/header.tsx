@@ -13,7 +13,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header
-      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white border-b border-gray-200 transition-all duration-300 ${sidebarOpen ? 'left-[400px]' : 'left-0'
+      className={`fixed top-0 right-0 z-40 h-20 items-stretch bg-white border-b border-gray-200 transition-all duration-300 ${sidebarOpen ? 'hidden sm:flex sm:left-[400px]' : 'flex left-0'
         }`}
     >
       {/* Left section — hidden when sidebar is open */}
@@ -45,19 +45,19 @@ export default function Header({
       )}
 
       {/* Right section */}
-      <div className="flex flex-1 items-center px-6">
+      <div className="flex flex-1 items-center px-3 sm:px-6 min-w-0">
 
         {/* Logo */}
         <img
           src="public/LogoInvenzis.jpg"
           alt="Logo Invenzis"
-          className="h-12 w-13 shrink-0 rounded object-contain"
+          className="h-8 sm:h-12 w-auto shrink-0 rounded object-contain"
         />
 
         {/* Title + Subtitle pushed to far right */}
-        <div className="ml-auto flex flex-col items-end">
-          <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-          <p className="text-mdx text-blue-500">{subtitle}</p>
+        <div className="ml-auto flex flex-col items-end min-w-0 pl-2">
+          <h1 className="text-sm sm:text-xl font-bold text-gray-900 truncate">{title}</h1>
+          <p className="text-xs text-blue-500 truncate">{subtitle}</p>
         </div>
       </div>
     </header>

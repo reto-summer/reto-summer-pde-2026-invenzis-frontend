@@ -33,7 +33,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
     };
 
     return (
-        <aside className="w-[400px] h-screen bg-white px-8 py-8 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-gray-200 text-gray-900">
+        <aside className="w-full sm:w-[400px] h-screen bg-white px-8 py-8 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-gray-200 text-gray-900">
             <div className="flex items-center gap-3 mb-2">
                 {onClose && (
                     <button
