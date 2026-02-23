@@ -1,0 +1,51 @@
+name: Deploy DEV to Cloud Run
+
+on:
+  push:
+    branches: ["dev"]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: ${{ vars.GCP_REGION || 'us-east1' }}
+  AR_REPO: reto-summer-pde-2026
+  SERVICE_NAME: qa-reto-summer-pde-2026-frontend
+  IMAGE_NAME: qa-reto-summer-pde-2026-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker auth for Artifact Registry
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build -t $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Deploy to Cloud Run (DEV)
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }} \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated
