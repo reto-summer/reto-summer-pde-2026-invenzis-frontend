@@ -24,7 +24,7 @@ export default function MainPage() {
 
       {/* Main content — shifts right when sidebar is open */}
       <div
-        className={`transition-[margin] duration-300 ${sidebarOpen ? "ml-[400px]" : "ml-0"}`}
+        className={`transition-[margin] duration-300 ${sidebarOpen ? "sm:ml-[400px]" : "ml-0"}`}
       >
         {/* Fixed header */}
         <Header
