@@ -6,6 +6,7 @@ interface SidebarProps {
 
 export default function Sidebar({ onClose }: SidebarProps = {}) {
     const [mail, setMail] = useState('');
+    const [mails, setMails] = useState<string[]>([]);
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
     const [familia, setFamilia] = useState('');
@@ -26,6 +27,13 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
             subclase
         });
         if (onClose) onClose();
+    };
+
+    const handleAddMail = () => {
+        if (mail && !mails.includes(mail)) {
+            setMails([...mails, mail]);
+            setMail('');
+        }
     };
 
     return (
@@ -52,14 +60,30 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 {/* Mail */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
                     <label htmlFor="mail" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Email</label>
-                    <input
-                        id="mail"
-                        type="email"
-                        value={mail}
-                        onChange={e => setMail(e.target.value)}
-                        placeholder="nombre@empresa.com"
-                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
+                    <div className="flex flex-wrap gap-2 pr-8">
+                        <input
+                            id="mail"
+                            type="email"
+                            value={mail}
+                            onChange={e => setMail(e.target.value)}
+                            placeholder="nombre@empresa.com"
+                            className="flex-1 min-w-0 px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddMail}
+                            className="px-3 py-2 rounded text-sm border border-slate-300 bg-white text-slate-700 font-bold hover:border-slate-500 transition-colors"
+                        >
+                            Agregar
+                        </button>
+                    </div>
+                    {mails.length > 0 && (
+                        <ul className="mt-2 space-y-1">
+                            {mails.map((m, idx) => (
+                                <li key={idx} className="text-sm text-gray-700 bg-gray-100 rounded px-2 py-1 break-all">{m}</li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
 
                 {/* Fecha Inicio */}
