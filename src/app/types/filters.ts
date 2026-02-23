@@ -16,8 +16,8 @@ export interface FiltersState {
   search: string;
   tenderTypes: TenderTypeKey[];
   dateRanges: DateRangeKey[];
-  familia?: number | null;
-  subfamilia?: number | null;
+  familia: number;
+  subfamilia: number;
 }
 
 /** Etiquetas en español para cada tipo de licitación */
@@ -39,4 +39,6 @@ export const DEFAULT_FILTERS: FiltersState = {
   search: "",
   tenderTypes: ["licitacion_publica", "compra_directa", "licitacion_abreviada"],
   dateRanges: [],
+  familia: 0,
+  subfamilia: 0
 };
