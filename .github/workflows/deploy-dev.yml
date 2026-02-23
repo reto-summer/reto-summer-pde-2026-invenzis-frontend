@@ -9,7 +9,7 @@ permissions:
   id-token: write
 
 env:
-  REGION: ${{ vars.GCP_REGION || 'us-east1' }}
+  REGION: us-east1
   AR_REPO: reto-summer-pde-2026
   SERVICE_NAME: qa-reto-summer-pde-2026-frontend
   IMAGE_NAME: qa-reto-summer-pde-2026-frontend
