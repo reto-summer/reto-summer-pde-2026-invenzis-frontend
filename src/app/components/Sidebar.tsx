@@ -11,8 +11,6 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
     const [fechaFin, setFechaFin] = useState('');
     const [familia, setFamilia] = useState('');
     const [subfamilia, setSubfamilia] = useState('');
-    const [clase, setClase] = useState('');
-    const [subclase, setSubclase] = useState('');
 
     const familias = ['Familia 1', 'Familia 2', 'Familia 3'];
     const subfamilias = ['Subfamilia 1', 'Subfamilia 2', 'Subfamilia 3'];
