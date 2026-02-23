@@ -6,13 +6,11 @@ export function useBids() {
 
   const filteredBids = useMemo(() => {
     return bids.filter((bid) => {
-      // Filtro por búsqueda de texto
       const matchesSearch =
         filters.search === "" ||
         bid.title.toLowerCase().includes(filters.search.toLowerCase()) ||
         bid.description.toLowerCase().includes(filters.search.toLowerCase());
 
-      // Filtro por tipo de licitación
       const matchesType =
         filters.tenderTypes.length === 0 ||
         filters.tenderTypes.some((type) => {
@@ -28,7 +26,6 @@ export function useBids() {
           }
         });
 
-      // Filtro por rango de tiempo
       const hours =
         (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
       const matchesTime =
@@ -36,11 +33,11 @@ export function useBids() {
         filters.dateRanges.some((range) => {
           switch (range) {
             case "under_7":
-              return hours <= 168; // 7 días
+              return hours <= 168;
             case "7_15":
-              return hours > 168 && hours <= 360; // 7-15 días
+              return hours > 168 && hours <= 360;
             case "over_15":
-              return hours > 360; // >15 días
+              return hours > 360;
             default:
               return false;
           }
