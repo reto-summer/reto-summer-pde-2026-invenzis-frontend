@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
 interface SidebarProps {
-  onClose?: () => void;
+    onClose?: () => void;
 }
 
 export default function Sidebar({ onClose }: SidebarProps = {}) {
     const [mail, setMail] = useState('');
+    const [mails, setMails] = useState<string[]>([]);
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
     const [familia, setFamilia] = useState('');
@@ -25,10 +26,18 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
             clase,
             subclase
         });
+        if (onClose) onClose();
+    };
+
+    const handleAddMail = () => {
+        if (mail && !mails.includes(mail)) {
+            setMails([...mails, mail]);
+            setMail('');
+        }
     };
 
     return (
-        <aside className="w-80 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 px-6 py-8 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-700/50">
+        <aside className="w-[400px] h-screen bg-white px-8 py-8 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-gray-200 text-gray-900">
             <div className="flex items-center gap-3 mb-2">
                 {onClose && (
                     <button
@@ -42,59 +51,75 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                         </svg>
                     </button>
                 )}
-                <h2 className="text-3xl font-heading font-bold text-white tracking-tight">
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Configuraciones
                 </h2>
             </div>
 
-            <div className="flex-1 flex flex-col gap-0 overflow-y-auto pr-2">
+            <div className="flex-1 flex flex-col gap-0 overflow-y-auto pr-6 pb-8">
                 {/* Mail */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="mail" className="text-xs font-bold text-slate-300 uppercase tracking-widest">Email</label>
-                    <input
-                        id="mail"
-                        type="email"
-                        value={mail}
-                        onChange={e => setMail(e.target.value)}
-                        placeholder="nombre@empresa.com"
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
-                    />
+                    <label htmlFor="mail" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Email</label>
+                    <div className="flex flex-wrap gap-2 pr-8">
+                        <input
+                            id="mail"
+                            type="email"
+                            value={mail}
+                            onChange={e => setMail(e.target.value)}
+                            placeholder="nombre@empresa.com"
+                            className="flex-1 min-w-0 px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddMail}
+                            className="px-3 py-2 rounded text-sm border border-slate-300 bg-white text-slate-700 font-bold hover:border-slate-500 transition-colors"
+                        >
+                            Agregar
+                        </button>
+                    </div>
+                    {mails.length > 0 && (
+                        <ul className="mt-2 space-y-1">
+                            {mails.map((m, idx) => (
+                                <li key={idx} className="text-sm text-gray-700 bg-gray-100 rounded px-2 py-1 break-all">{m}</li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
 
                 {/* Fecha Inicio */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="fechaInicio" className="text-xs font-bold text-slate-300 uppercase tracking-widest">Inicio</label>
+                    <label htmlFor="fechaInicio" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Inicio</label>
                     <input
                         id="fechaInicio"
                         type="date"
                         value={fechaInicio}
                         onChange={e => setFechaInicio(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     />
                 </div>
 
                 {/* Fecha Fin */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="fechaFin" className="text-xs font-bold text-slate-300 uppercase tracking-widest">Fin</label>
+                    <label htmlFor="fechaFin" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Fin</label>
                     <input
                         id="fechaFin"
                         type="date"
                         value={fechaFin}
                         onChange={e => setFechaFin(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     />
                 </div>
 
                 {/* Familia */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="familia" className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                    <label htmlFor="familia" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Familia
                     </label>
                     <select
                         id="familia"
                         value={familia}
                         onChange={(e) => setFamilia(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     >
                         <option value="">Seleccionar...</option>
                         {familias.map((f) => (
@@ -107,14 +132,14 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
                 {/* Subfamilia */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="subfamilia" className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                    <label htmlFor="subfamilia" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Subfamilia
                     </label>
                     <select
                         id="subfamilia"
                         value={subfamilia}
                         onChange={(e) => setSubfamilia(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     >
                         <option value="">Seleccionar...</option>
                         {subfamilias.map((sf) => (
@@ -127,14 +152,14 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
                 {/* Clase */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="clase" className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                    <label htmlFor="clase" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Clase
                     </label>
                     <select
                         id="clase"
                         value={clase}
                         onChange={(e) => setClase(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     >
                         <option value="">Seleccionar...</option>
                         {clases.map((c) => (
@@ -147,14 +172,14 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
                 {/* Subclase */}
                 <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="subclase" className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                    <label htmlFor="subclase" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Subclase
                     </label>
                     <select
                         id="subclase"
                         value={subclase}
                         onChange={(e) => setSubclase(e.target.value)}
-                        className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-white cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all backdrop-blur-sm hover:bg-slate-700/70"
+                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     >
                         <option value="">Seleccionar...</option>
                         {subclases.map((sc) => (
@@ -165,15 +190,15 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                     </select>
                 </div>
 
-                {/* Button */}
-                <div className="flex-1 flex items-end">
-                    <button
-                        onClick={handleApply}
-                        className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-lg transition-all duration-200 hover:from-blue-700 hover:to-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 shadow-lg hover:shadow-xl uppercase tracking-wide"
-                    >
-                        Filtrar
-                    </button>
-                </div>
+            </div>
+            {/* Botón debajo del contenido */}
+            <div className="mt-4">
+                <button
+                    onClick={handleApply}
+                    className="w-full px-3 py-2 rounded text-sm border border-slate-300 bg-white text-slate-700 font-bold hover:border-slate-500 transition-colors"
+                >
+                    Filtrar
+                </button>
             </div>
         </aside>
     );
