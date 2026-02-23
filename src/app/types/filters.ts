@@ -11,10 +11,13 @@ export type TenderTypeKey = "licitacion_publica" | "compra_directa" | "licitacio
 export type DateRangeKey = "under_7" | "7_15" | "over_15";
 
 /** Estado completo de los filtros (controlado por el padre vía value/onChange) */
+
 export interface FiltersState {
   search: string;
   tenderTypes: TenderTypeKey[];
   dateRanges: DateRangeKey[];
+  familia: number;
+  subfamilia: number;
 }
 
 /** Etiquetas en español para cada tipo de licitación */
@@ -36,4 +39,6 @@ export const DEFAULT_FILTERS: FiltersState = {
   search: "",
   tenderTypes: ["licitacion_publica", "compra_directa", "licitacion_abreviada"],
   dateRanges: [],
+  familia: 0,
+  subfamilia: 0
 };
