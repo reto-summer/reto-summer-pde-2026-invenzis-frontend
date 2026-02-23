@@ -197,7 +197,7 @@ export function Filters({ value, onChange }: FiltersProps) {
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Búsqueda</label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
                   <SearchIcon />
                 </span>
                 <input
@@ -276,7 +276,7 @@ export function Filters({ value, onChange }: FiltersProps) {
           <div className="flex flex-row flex-wrap items-center gap-4">
             {/* Búsqueda */}
             <div className="relative flex-1 min-w-[200px] max-w-md">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
                 <SearchIcon />
               </span>
               <input
