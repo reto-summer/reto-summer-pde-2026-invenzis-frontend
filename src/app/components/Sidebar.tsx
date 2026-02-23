@@ -16,15 +16,11 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
     const familias = ['Familia 1', 'Familia 2', 'Familia 3'];
     const subfamilias = ['Subfamilia 1', 'Subfamilia 2', 'Subfamilia 3'];
-    const clases = ['Clase 1', 'Clase 2', 'Clase 3'];
-    const subclases = ['Subclase 1', 'Subclase 2', 'Subclase 3'];
 
     const handleApply = () => {
         console.log('Configuración aplicada:', {
             familia,
-            subfamilia,
-            clase,
-            subclase
+            subfamilia
         });
         if (onClose) onClose();
     };
@@ -42,7 +38,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 {onClose && (
                     <button
                         onClick={onClose}
-                        className="text-white hover:text-slate-300 transition-colors"
+                        className="text-gray-900 hover:text-slate-300 transition-colors"
                         aria-label="Cerrar configuraciones"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -58,9 +54,9 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
             <div className="flex-1 flex flex-col gap-0 overflow-y-auto pr-6 pb-8">
                 {/* Mail */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
+                <div className="py-8 flex flex-col gap-3 border-b border-gray-200">
                     <label htmlFor="mail" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Email</label>
-                    <div className="flex flex-wrap gap-2 pr-8">
+                    <div className="flex flex-wrap gap-2">
                         <input
                             id="mail"
                             type="email"
@@ -87,8 +83,8 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 </div>
 
                 {/* Fecha Inicio */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="fechaInicio" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Inicio</label>
+                <div className="py-8 flex flex-col gap-3 border-b border-gray-200">
+                    <label htmlFor="fechaInicio" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Fecha de Publicación</label>
                     <input
                         id="fechaInicio"
                         type="date"
@@ -99,8 +95,8 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 </div>
 
                 {/* Fecha Fin */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="fechaFin" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Fin</label>
+                <div className="py-8 flex flex-col gap-3 border-b border-gray-200">
+                    <label htmlFor="fechaFin" className="text-xs font-bold text-gray-900 uppercase tracking-widest">Fecha de Cierre</label>
                     <input
                         id="fechaFin"
                         type="date"
@@ -111,83 +107,57 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 </div>
 
                 {/* Familia */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
+                <div className="py-8 flex flex-col gap-3 border-b border-gray-200">
                     <label htmlFor="familia" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Familia
                     </label>
-                    <select
-                        id="familia"
-                        value={familia}
-                        onChange={(e) => setFamilia(e.target.value)}
-                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    >
-                        <option value="">Seleccionar...</option>
-                        {familias.map((f) => (
-                            <option key={f} value={f}>
-                                {f}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <select
+                            id="familia"
+                            value={familia}
+                            onChange={(e) => setFamilia(e.target.value)}
+                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        >
+                            <option value="">Seleccionar...</option>
+                            {familias.map((f) => (
+                                <option key={f} value={f}>
+                                    {f}
+                                </option>
+                            ))}
+                        </select>
+                        <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {/* Subfamilia */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
+                <div className="py-8 flex flex-col gap-3 border-b border-gray-200">
                     <label htmlFor="subfamilia" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
                         Subfamilia
                     </label>
-                    <select
-                        id="subfamilia"
-                        value={subfamilia}
-                        onChange={(e) => setSubfamilia(e.target.value)}
-                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    >
-                        <option value="">Seleccionar...</option>
-                        {subfamilias.map((sf) => (
-                            <option key={sf} value={sf}>
-                                {sf}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Clase */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="clase" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
-                        Clase
-                    </label>
-                    <select
-                        id="clase"
-                        value={clase}
-                        onChange={(e) => setClase(e.target.value)}
-                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    >
-                        <option value="">Seleccionar...</option>
-                        {clases.map((c) => (
-                            <option key={c} value={c}>
-                                {c}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Subclase */}
-                <div className="py-8 flex flex-col gap-3 border-b border-slate-700/50">
-                    <label htmlFor="subclase" className="text-xs font-bold text-gray-900 uppercase tracking-widest">
-                        Subclase
-                    </label>
-                    <select
-                        id="subclase"
-                        value={subclase}
-                        onChange={(e) => setSubclase(e.target.value)}
-                        className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    >
-                        <option value="">Seleccionar...</option>
-                        {subclases.map((sc) => (
-                            <option key={sc} value={sc}>
-                                {sc}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <select
+                            id="subfamilia"
+                            value={subfamilia}
+                            onChange={(e) => setSubfamilia(e.target.value)}
+                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        >
+                            <option value="">Seleccionar...</option>
+                            {subfamilias.map((sf) => (
+                                <option key={sf} value={sf}>
+                                    {sf}
+                                </option>
+                            ))}
+                        </select>
+                        <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
             </div>

@@ -66,7 +66,7 @@ export default function MainPage({ bids = [] }: MainPageProps) {
 
       {/* Main content — shifts right when sidebar is open */}
       <div
-        className={`transition-[margin] duration-300 ${sidebarOpen ? "ml-80" : "ml-0"}`}
+        className={`transition-[margin] duration-300 ${sidebarOpen ? "ml-[400px]" : "ml-0"}`}
       >
         {/* Fixed header */}
         <Header
