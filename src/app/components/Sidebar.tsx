@@ -25,6 +25,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
             clase,
             subclase
         });
+        if (onClose) onClose();
     };
 
     return (
