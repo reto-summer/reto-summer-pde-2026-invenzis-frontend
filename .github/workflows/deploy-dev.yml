@@ -1,8 +1,10 @@
-name: Deploy DEV to Cloud Run
+name: Deploy to DEV
 
 on:
   push:
-    branches: ["dev"]
+    branches:
+      - dev
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,20 +34,20 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker auth for Artifact Registry
-        run: gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
       - name: Build Docker image
         run: |
-          docker build -t $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }} .
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Deploy to Cloud Run (DEV)
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --image $REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$IMAGE_NAME:${{ github.sha }} \
-            --region $REGION \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated
