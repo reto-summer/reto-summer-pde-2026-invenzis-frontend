@@ -1,6 +1,7 @@
 import { useAppContext } from "../hooks/useAppContext";
-import { useBids } from "../hooks/useBids";
+import { useLicitaciones } from "../hooks/useLicitaciones";
 import { DEFAULT_FILTERS } from "../types/filters";
+import { useMemo } from "react";
 import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
 import { BidCard } from "../components/BidCard";
@@ -11,7 +12,54 @@ import { EmptyState } from "../components/ui/EmptyState";
 
 export default function MainPage() {
   const { sidebarOpen, setSidebarOpen, filters, setFilters } = useAppContext();
-  const { filteredBids, loading, error } = useBids();
+  const { licitaciones, loading, error } = useLicitaciones({
+    familia: filters.familia,
+    subfamilia: filters.subfamilia,
+  });
+
+  // Aplicar filtros locales 
+  const filteredBids = useMemo(() => {
+    return licitaciones.filter((bid) => {
+      const matchesSearch =
+        filters.search === "" ||
+        bid.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        bid.description.toLowerCase().includes(filters.search.toLowerCase());
+
+      const matchesType =
+        filters.tenderTypes.length === 0 ||
+        filters.tenderTypes.some((type) => {
+          switch (type) {
+            case "licitacion_publica":
+              return bid.title.includes("Licitación Pública");
+            case "compra_directa":
+              return bid.title.includes("Compra Directa");
+            case "licitacion_abreviada":
+              return bid.title.includes("Licitación Abreviada");
+            default:
+              return false;
+          }
+        });
+
+      const hours =
+        (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
+      const matchesTime =
+        filters.dateRanges.length === 0 ||
+        filters.dateRanges.some((range) => {
+          switch (range) {
+            case "under_7":
+              return hours <= 168;
+            case "7_15":
+              return hours > 168 && hours <= 360;
+            case "over_15":
+              return hours > 360;
+            default:
+              return false;
+          }
+        });
+
+      return matchesSearch && matchesType && matchesTime;
+    });
+  }, [licitaciones, filters]);
 
   function handleClearFilters() {
     setFilters(DEFAULT_FILTERS);
@@ -49,7 +97,11 @@ export default function MainPage() {
             ) : error ? (
               <ErrorMessage message={error} />
             ) : filteredBids.length === 0 ? (
-              <EmptyState onClear={handleClearFilters} />
+              <EmptyState
+                title="No hay licitaciones disponibles"
+                description="No se encontraron licitaciones en este momento."
+                onClear={handleClearFilters}
+              />
             ) : (
               filteredBids.map((bid) => (
                 <BidCard key={bid.id_licitacion} bid={bid} />

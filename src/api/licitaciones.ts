@@ -4,6 +4,8 @@ import type { FiltersState } from "../app/types/filters";
 
 /**
  * Query para GET /licitaciones. Solo se envían los filtros activos.
+ * familia y subfamilia son requeridos según la especificación.
+ * clase, subclase, fecha_publicacion y fecha_cierre son opcionales.
  * fecha_publicacion: YYYY-MM-DD
  * fecha_cierre: YYYY-MM-DDTHH:MM:SS
  */
