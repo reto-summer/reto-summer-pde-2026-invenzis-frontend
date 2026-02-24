@@ -109,4 +109,13 @@
     flex: 1;
     overflow-y: auto;
   }
+
+  /* Scroll sin scrollbar visible */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
