@@ -1,33 +1,45 @@
 import { useState } from 'react';
+import { useEmailConfig } from '../hooks/useEmailConfig';
+import { useFamilias } from '../hooks/useFamilias';
 
 interface SidebarProps {
     onClose?: () => void;
 }
 
 export default function Sidebar({ onClose }: SidebarProps = {}) {
-    const [mail, setMail] = useState('');
-    const [mails, setMails] = useState<string[]>([]);
+    const [mailInput, setMailInput] = useState('');
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
-    const [familia, setFamilia] = useState('');
-    const [subfamilia, setSubfamilia] = useState('');
 
-    const familias = ['Familia 1', 'Familia 2', 'Familia 3'];
-    const subfamilias = ['Subfamilia 1', 'Subfamilia 2', 'Subfamilia 3'];
+    const {
+        emails,
+        loading: loadingEmails,
+        error: emailError,
+        addEmail,
+        removeEmail,
+    } = useEmailConfig();
+
+    const {
+        familias,
+        subfamilias,
+        familiaCod,
+        subfamiliaCod,
+        setFamiliaCod,
+        setSubfamiliaCod,
+        loadingFamilias,
+        loadingSubfamilias,
+        error: famError,
+    } = useFamilias();
 
     const handleApply = () => {
-        console.log('Configuración aplicada:', {
-            familia,
-            subfamilia
-        });
         if (onClose) onClose();
     };
 
-    const handleAddMail = () => {
-        if (mail && !mails.includes(mail)) {
-            setMails([...mails, mail]);
-            setMail('');
-        }
+    const handleAddMail = async () => {
+        const trimmed = mailInput.trim();
+        if (!trimmed) return;
+        await addEmail(trimmed);
+        setMailInput('');
     };
 
     return (
@@ -83,14 +95,17 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                     <div className="relative">
                         <select
                             id="familia"
-                            value={familia}
-                            onChange={(e) => setFamilia(e.target.value)}
-                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            value={familiaCod ?? ''}
+                            onChange={(e) => setFamiliaCod(e.target.value || null)}
+                            disabled={loadingFamilias}
+                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <option value="">Seleccionar...</option>
+                            <option value="">
+                                {loadingFamilias ? 'Cargando...' : 'Seleccionar...'}
+                            </option>
                             {familias.map((f) => (
-                                <option key={f} value={f}>
-                                    {f}
+                                <option key={f.cod} value={f.cod}>
+                                    {f.descripcion}
                                 </option>
                             ))}
                         </select>
@@ -100,6 +115,9 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                             </svg>
                         </span>
                     </div>
+                    {famError && (
+                        <p className="text-xs text-red-500 mt-1">{famError}</p>
+                    )}
                 </div>
 
                 {/* Subfamilia */}
@@ -110,14 +128,17 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                     <div className="relative">
                         <select
                             id="subfamilia"
-                            value={subfamilia}
-                            onChange={(e) => setSubfamilia(e.target.value)}
-                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            value={subfamiliaCod ?? ''}
+                            onChange={(e) => setSubfamiliaCod(e.target.value || null)}
+                            disabled={!familiaCod || loadingSubfamilias}
+                            className="w-full appearance-none pl-4 pr-12 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <option value="">Seleccionar...</option>
+                            <option value="">
+                                {loadingSubfamilias ? 'Cargando...' : 'Seleccionar...'}
+                            </option>
                             {subfamilias.map((sf) => (
-                                <option key={sf} value={sf}>
-                                    {sf}
+                                <option key={sf.cod} value={sf.cod}>
+                                    {sf.nombre}
                                 </option>
                             ))}
                         </select>
@@ -136,8 +157,9 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                         <input
                             id="mail"
                             type="email"
-                            value={mail}
-                            onChange={e => setMail(e.target.value)}
+                            value={mailInput}
+                            onChange={e => setMailInput(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleAddMail(); }}
                             placeholder="nombre@empresa.com"
                             className="flex-1 min-w-0 px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                         />
@@ -149,10 +171,28 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                             Agregar
                         </button>
                     </div>
-                    {mails.length > 0 && (
+                    {loadingEmails && (
+                        <p className="text-xs text-gray-400 mt-1">Cargando emails...</p>
+                    )}
+                    {emailError && (
+                        <p className="text-xs text-red-500 mt-1">{emailError}</p>
+                    )}
+                    {emails.length > 0 && (
                         <ul className="mt-2 space-y-1">
-                            {mails.map((m, idx) => (
-                                <li key={idx} className="text-sm text-gray-700 bg-gray-100 rounded px-2 py-1 break-all">{m}</li>
+                            {emails.map((e) => (
+                                <li key={e.direccion} className="flex items-center justify-between gap-2 text-sm text-gray-700 bg-gray-100 rounded px-2 py-1">
+                                    <span className="break-all">{e.direccion}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeEmail(e.direccion)}
+                                        className="shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                                        aria-label={`Eliminar ${e.direccion}`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                                        </svg>
+                                    </button>
+                                </li>
                             ))}
                         </ul>
                     )}
