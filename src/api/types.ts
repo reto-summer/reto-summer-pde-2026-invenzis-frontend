@@ -13,3 +13,7 @@ export interface Subfamilia {
   cod: string;
   nombre: string;
 }
+
+export interface EmailConfig {
+  direccion: string;
+}

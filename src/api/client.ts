@@ -44,6 +44,10 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
 export const api = {
   get: <T>(path: string, config?: RequestConfig) =>
     request<T>(path, { ...config, method: "GET" }),
+  post: <T>(path: string, body?: unknown, config?: RequestConfig) =>
+    request<T>(path, { ...config, method: "POST", body: body !== undefined ? JSON.stringify(body) : undefined }),
+  delete: <T>(path: string, config?: RequestConfig) =>
+    request<T>(path, { ...config, method: "DELETE" }),
 };
 
 export { BASE_URL };

@@ -3,5 +3,6 @@
  */
 
 export { api, BASE_URL, type RequestConfig } from "./client";
-export type { Familia, Subfamilia } from "./types";
+export type { Familia, Subfamilia, EmailConfig } from "./types";
 export { getFamilias, getSubfamiliasPorFamilia } from "./familias";
+export { getEmailConfig, postEmailConfig, deleteEmailConfig } from "./emailConfig";
