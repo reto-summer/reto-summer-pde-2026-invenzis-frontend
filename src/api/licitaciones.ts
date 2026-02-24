@@ -11,8 +11,6 @@ export interface LicitacionesQuery {
     [key: string]: string | number | undefined;
     familia?: number;
     subfamilia?: number;
-    clase?: number;
-    subclase?: number;
     fecha_publicacion?: string;
     fecha_cierre?: string;
 }
