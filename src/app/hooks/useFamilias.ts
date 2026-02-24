@@ -1,9 +1,8 @@
 /**
  * Hook useFamilias — Cascada Familia → Subfamilia
- * Para GET /licitaciones usá familiaId y subfamiliaId.
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getFamilias, getSubfamiliasPorFamilia } from "../../api/familias";
 import type { Familia, Subfamilia } from "../../api/types";
 
@@ -12,8 +11,6 @@ export interface UseFamiliasResult {
   subfamilias: Subfamilia[];
   familiaCod: string | null;
   subfamiliaCod: string | null;
-  familiaId: number | null;
-  subfamiliaId: number | null;
   setFamiliaCod: (cod: string | null) => void;
   setSubfamiliaCod: (cod: string | null) => void;
   loadingFamilias: boolean;
@@ -82,25 +79,11 @@ export function useFamilias(): UseFamiliasResult {
     };
   }, [familiaCod]);
 
-  const familiaId = useMemo(() => {
-    if (!familiaCod) return null;
-    const f = familias.find((x) => x.cod === familiaCod);
-    return f ? f.id : null;
-  }, [familias, familiaCod]);
-
-  const subfamiliaId = useMemo(() => {
-    if (!subfamiliaCod) return null;
-    const s = subfamilias.find((x) => x.cod === subfamiliaCod);
-    return s ? s.id : null;
-  }, [subfamilias, subfamiliaCod]);
-
   return {
     familias,
     subfamilias,
     familiaCod,
     subfamiliaCod,
-    familiaId,
-    subfamiliaId,
     setFamiliaCod,
     setSubfamiliaCod,
     loadingFamilias,
