@@ -3,15 +3,14 @@
  */
 
 export interface Familia {
-  id: number;
-  cod: string;
+  cod: number;
   descripcion: string;
 }
 
 export interface Subfamilia {
-  id: number;
-  cod: string;
-  nombre: string;
+  famiCod: number;
+  cod: number;
+  descripcion: string;
 }
 
 export interface EmailConfig {
