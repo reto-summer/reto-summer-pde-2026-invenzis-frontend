@@ -6,21 +6,23 @@ export function useBids() {
 
   const filteredBids = useMemo(() => {
     return bids.filter((bid) => {
+      const title = bid.title ?? "";
+      const description = bid.description ?? "";
       const matchesSearch =
         filters.search === "" ||
-        bid.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        bid.description.toLowerCase().includes(filters.search.toLowerCase());
+        title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        description.toLowerCase().includes(filters.search.toLowerCase());
 
       const matchesType =
         filters.tenderTypes.length === 0 ||
         filters.tenderTypes.some((type) => {
           switch (type) {
             case "licitacion_publica":
-              return bid.title.includes("Licitación Pública");
+              return title.includes("Licitación Pública");
             case "compra_directa":
-              return bid.title.includes("Compra Directa");
+              return title.includes("Compra Directa");
             case "licitacion_abreviada":
-              return bid.title.includes("Licitación Abreviada");
+              return title.includes("Licitación Abreviada");
             default:
               return false;
           }

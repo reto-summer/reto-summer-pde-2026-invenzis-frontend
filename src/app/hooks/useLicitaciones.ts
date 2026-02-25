@@ -37,8 +37,11 @@ export function useLicitaciones(initialQuery: LicitacionesQuery = {}): UseLicita
     }, []);
 
     useEffect(() => {
-        // Cargar licitaciones con los filtros disponibles (pueden ser 0 o vacíos)
-        fetchLicitaciones({ familia, subfamilia });
+        // Cargar licitaciones con filtros válidos (evitar enviar 0)
+        const query: LicitacionesQuery = {};
+        if (familia && familia > 0) query.familia = familia;
+        if (subfamilia && subfamilia > 0) query.subfamilia = subfamilia;
+        fetchLicitaciones(query);
     }, [fetchLicitaciones, familia, subfamilia]);
 
     return {

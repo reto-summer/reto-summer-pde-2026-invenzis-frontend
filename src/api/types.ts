@@ -28,3 +28,14 @@ export interface NotificacionDetalle extends NotificacionResumen {
   detail: string | null;
   content: string | null;
 }
+export interface LicitacionBackendResponse {
+  idLicitacion: number;
+  titulo?: string;
+  tipoLicitacion?: string;
+  descripcion?: string;
+  fechaPublicacion?: string;
+  fechaCierre?: string;
+  link?: string;
+  familia?: Familia;
+  subfamilia?: Subfamilia;
+}
