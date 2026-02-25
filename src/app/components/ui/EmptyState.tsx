@@ -10,7 +10,7 @@ export function EmptyState({
   onClear,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-36 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-72 md:py-48 px-4 text-center">
       <div className="flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 mb-4">
         <svg
           className="w-7 h-7 text-slate-400"
