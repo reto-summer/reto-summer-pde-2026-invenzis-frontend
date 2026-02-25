@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { NotificationPanel } from "./NotificationPanel";
-import { getNotificaciones } from "../../api/notificaciones";
+import { useNotificaciones } from "../hooks/useNotificaciones";
 
 interface HeaderProps {
   title?: string;
@@ -16,14 +16,10 @@ export default function Header({
   sidebarOpen = false,
 }: HeaderProps) {
   const [panelOpen, setPanelOpen] = useState(false);
-  const [notifCount, setNotifCount] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    getNotificaciones()
-      .then((data) => setNotifCount(data.length))
-      .catch(() => setNotifCount(0));
-  }, []);
+  const notifHook = useNotificaciones();
+  const hasUnread = notifHook.unreadCount > 0;
 
   useEffect(() => {
     if (!panelOpen) return;
@@ -38,8 +34,9 @@ export default function Header({
 
   return (
     <header
-      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white transition-all duration-300 ${sidebarOpen ? "left-[400px]" : "left-0"
-        }`}
+      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white transition-all duration-300 ${
+        sidebarOpen ? "left-[400px]" : "left-0"
+      }`}
     >
       <div className="flex flex-1 items-center gap-4 px-4 md:px-6">
 
@@ -81,7 +78,7 @@ export default function Header({
             <p className="text-xs text-blue-500 truncate">{subtitle}</p>
           </div>
 
-          {/* Bell icon with notification panel */}
+          {/* Bell with unread dot */}
           <div className="relative shrink-0" ref={panelRef}>
             <button
               type="button"
@@ -103,15 +100,16 @@ export default function Header({
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
               </svg>
-              {notifCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none px-1">
-                  {notifCount > 99 ? "99+" : notifCount}
-                </span>
+              {hasUnread && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white" />
               )}
             </button>
 
             {panelOpen && (
-              <NotificationPanel onClose={() => setPanelOpen(false)} />
+              <NotificationPanel
+                hook={notifHook}
+                onClose={() => setPanelOpen(false)}
+              />
             )}
           </div>
         </div>

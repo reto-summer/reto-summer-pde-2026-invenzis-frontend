@@ -1,10 +1,26 @@
 /**
- * Hook useNotificaciones — GET /notificacion, GET /notificacion/{id}
+ * Hook useNotificaciones — lista, detalle, y leido/no-leido via localStorage.
  */
 
 import { useState, useEffect, useCallback } from "react";
 import { getNotificaciones, getNotificacion } from "../../api/notificaciones";
 import type { NotificacionResumen, NotificacionDetalle } from "../../api/types";
+
+const LS_KEY = "notificaciones_leidas";
+
+function loadReadIds(): Set<number> {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as number[]);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveReadIds(ids: Set<number>): void {
+  localStorage.setItem(LS_KEY, JSON.stringify([...ids]));
+}
 
 export interface UseNotificacionesResult {
   notificaciones: NotificacionResumen[];
@@ -12,6 +28,9 @@ export interface UseNotificacionesResult {
   loading: boolean;
   loadingDetalle: boolean;
   error: string | null;
+  unreadCount: number;
+  isRead: (id: number) => boolean;
+  markAsRead: (id: number) => void;
   fetchDetalle: (id: number) => Promise<void>;
   clearDetalle: () => void;
   refetch: () => Promise<void>;
@@ -23,6 +42,7 @@ export function useNotificaciones(): UseNotificacionesResult {
   const [loading, setLoading] = useState(true);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [readIds, setReadIds] = useState<Set<number>>(() => loadReadIds());
 
   const fetchNotificaciones = useCallback(async () => {
     setLoading(true);
@@ -42,7 +62,22 @@ export function useNotificaciones(): UseNotificacionesResult {
     fetchNotificaciones();
   }, [fetchNotificaciones]);
 
+  const markAsRead = useCallback((id: number) => {
+    setReadIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      saveReadIds(next);
+      return next;
+    });
+  }, []);
+
+  const isRead = useCallback((id: number) => readIds.has(id), [readIds]);
+
+  const unreadCount = notificaciones.filter((n) => !readIds.has(n.id)).length;
+
   const fetchDetalle = useCallback(async (id: number) => {
+    markAsRead(id);
     setLoadingDetalle(true);
     setError(null);
     try {
@@ -53,7 +88,7 @@ export function useNotificaciones(): UseNotificacionesResult {
     } finally {
       setLoadingDetalle(false);
     }
-  }, []);
+  }, [markAsRead]);
 
   const clearDetalle = useCallback(() => {
     setDetalleActual(null);
@@ -65,6 +100,9 @@ export function useNotificaciones(): UseNotificacionesResult {
     loading,
     loadingDetalle,
     error,
+    unreadCount,
+    isRead,
+    markAsRead,
     fetchDetalle,
     clearDetalle,
     refetch: fetchNotificaciones,
