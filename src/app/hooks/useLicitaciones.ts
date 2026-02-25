@@ -19,7 +19,6 @@ export function useLicitaciones(initialQuery: LicitacionesQuery = {}): UseLicita
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Extraer valores para las dependencias
     const { familia, subfamilia } = initialQuery;
 
     const fetchLicitaciones = useCallback(async (query: LicitacionesQuery = {}) => {
@@ -37,7 +36,6 @@ export function useLicitaciones(initialQuery: LicitacionesQuery = {}): UseLicita
     }, []);
 
     useEffect(() => {
-        // Cargar licitaciones con filtros válidos (evitar enviar 0)
         const query: LicitacionesQuery = {};
         if (familia && familia > 0) query.familia = familia;
         if (subfamilia && subfamilia > 0) query.subfamilia = subfamilia;
