@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useEmailConfig } from '../hooks/useEmailConfig';
 import { useFamilias } from '../hooks/useFamilias';
+import { useAppContext } from '../context/AppContext';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -8,6 +9,8 @@ interface SidebarProps {
 
 export default function Sidebar({ onClose }: SidebarProps = {}) {
     const [mailInput, setMailInput] = useState('');
+
+    const { familiaCod: ctxFamiliaCod, subfamiliaCod: ctxSubfamiliaCod, setFiltrosCascada } = useAppContext();
 
     const {
         emails,
@@ -29,17 +32,26 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
         error: famError,
     } = useFamilias();
 
-    const initialFamiliaCod = useRef(familiaCod);
-    const initialSubfamiliaCod = useRef(subfamiliaCod);
-    const initialized = useRef(false);
+    // Refs inicializados desde el contexto (última selección confirmada)
+    const initialFamiliaCod = useRef(ctxFamiliaCod);
+    const initialSubfamiliaCod = useRef(ctxSubfamiliaCod);
 
+    // Al montar, restaurar la selección guardada en el contexto
+    const pendingSubfamilia = useRef<string | null>(ctxSubfamiliaCod);
     useEffect(() => {
-        if (!loadingFamilias && !initialized.current) {
-            initialFamiliaCod.current = familiaCod;
-            initialSubfamiliaCod.current = subfamiliaCod;
-            initialized.current = true;
+        if (ctxFamiliaCod) {
+            setFamiliaCod(ctxFamiliaCod);
         }
-    }, [loadingFamilias, familiaCod, subfamiliaCod]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Una vez que cargaron las subfamilias, restaurar la subfamilia pendiente
+    useEffect(() => {
+        if (!loadingSubfamilias && pendingSubfamilia.current && subfamilias.length > 0) {
+            setSubfamiliaCod(pendingSubfamilia.current);
+            pendingSubfamilia.current = null;
+        }
+    }, [loadingSubfamilias, subfamilias, setSubfamiliaCod]);
 
     const hasChanges =
         familiaCod !== initialFamiliaCod.current ||
@@ -47,6 +59,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
 
     const handleConfirm = () => {
         if (!hasChanges) return;
+        setFiltrosCascada(familiaCod, subfamiliaCod);
         initialFamiliaCod.current = familiaCod;
         initialSubfamiliaCod.current = subfamiliaCod;
         if (onClose) onClose();

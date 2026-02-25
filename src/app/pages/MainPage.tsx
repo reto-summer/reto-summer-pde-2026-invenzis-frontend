@@ -11,10 +11,10 @@ import { ErrorMessage } from "../components/ui/ErrorMessage";
 import { EmptyState } from "../components/ui/EmptyState";
 
 export default function MainPage() {
-  const { sidebarOpen, setSidebarOpen, filters, setFilters } = useAppContext();
+  const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod } = useAppContext();
   const { licitaciones, loading, error } = useLicitaciones({
-    familia: filters.familia,
-    subfamilia: filters.subfamilia,
+    familia: familiaCod ? Number(familiaCod) : undefined,
+    subfamilia: subfamiliaCod ? Number(subfamiliaCod) : undefined,
   });
 
   // Aplicar filtros locales 
