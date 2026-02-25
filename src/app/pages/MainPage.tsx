@@ -1,7 +1,8 @@
+import { useMemo } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useLicitaciones } from "../hooks/useLicitaciones";
 import { DEFAULT_FILTERS } from "../types/filters";
-import { useMemo } from "react";
+import type { Bid } from "../types/Bid";
 import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
 import { BidCard } from "../components/BidCard";
@@ -17,24 +18,25 @@ export default function MainPage() {
     subfamilia: subfamiliaCod ? Number(subfamiliaCod) : undefined,
   });
 
-  // Aplicar filtros locales 
   const filteredBids = useMemo(() => {
     return licitaciones.filter((bid) => {
+      const title = bid.title ?? "";
+      const description = bid.description ?? "";
       const matchesSearch =
         filters.search === "" ||
-        bid.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        bid.description.toLowerCase().includes(filters.search.toLowerCase());
+        title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        description.toLowerCase().includes(filters.search.toLowerCase());
 
       const matchesType =
         filters.tenderTypes.length === 0 ||
         filters.tenderTypes.some((type) => {
           switch (type) {
             case "licitacion_publica":
-              return bid.title.includes("Licitación Pública");
+              return title.includes("Licitación Pública");
             case "compra_directa":
-              return bid.title.includes("Compra Directa");
+              return title.includes("Compra Directa");
             case "licitacion_abreviada":
-              return bid.title.includes("Licitación Abreviada");
+              return title.includes("Licitación Abreviada");
             default:
               return false;
           }
@@ -103,7 +105,7 @@ export default function MainPage() {
                 onClear={handleClearFilters}
               />
             ) : (
-              filteredBids.map((bid) => (
+              filteredBids.map((bid: Bid) => (
                 <BidCard key={bid.id_licitacion} bid={bid} />
               ))
             )}
