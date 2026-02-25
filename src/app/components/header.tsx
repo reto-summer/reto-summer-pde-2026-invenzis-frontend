@@ -75,7 +75,7 @@ export default function Header({
         <div className="ml-auto flex items-center gap-3 min-w-0">
           <div className="flex flex-col items-end min-w-0">
             <h1 className="text-sm sm:text-xl font-bold text-gray-900 truncate">{title}</h1>
-            <p className="text-xs text-blue-500 truncate">{subtitle}</p>
+            <p className="text-xs md:text-base text-blue-500 truncate">{subtitle}</p>
           </div>
 
           {/* Bell with unread dot */}
