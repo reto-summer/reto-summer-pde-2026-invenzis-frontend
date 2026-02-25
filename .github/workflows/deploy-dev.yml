@@ -56,4 +56,5 @@ jobs:
             --image ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --platform managed \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
             --allow-unauthenticated
