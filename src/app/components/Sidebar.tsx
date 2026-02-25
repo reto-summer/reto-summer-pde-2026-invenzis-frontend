@@ -75,22 +75,27 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
     return (
         <aside className="w-full sm:w-[400px] h-screen bg-white px-6 py-6 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-200 text-slate-900">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-                {onClose && (
-                    <button
-                        onClick={onClose}
-                        className="text-slate-400 hover:text-slate-700 transition-colors"
-                        aria-label="Cerrar configuraciones"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m12 19-7-7 7-7" />
-                            <path d="M19 12H5" />
-                        </svg>
-                    </button>
-                )}
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                    Configuraciones
-                </h2>
+            <div className="mb-6">
+                <div className="flex items-center gap-3">
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="text-slate-400 hover:text-slate-700 transition-colors"
+                            aria-label="Cerrar configuraciones"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m12 19-7-7 7-7" />
+                                <path d="M19 12H5" />
+                            </svg>
+                        </button>
+                    )}
+                    <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                        Configuración
+                    </h2>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                    Seleccione configuraciones para recibir notificación vía email.
+                </p>
             </div>
 
             <div className="flex-1 flex flex-col gap-5 overflow-y-auto no-scrollbar pb-4">
@@ -118,7 +123,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                         </select>
                         <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m6 9 6 6 6-6"/>
+                                <path d="m6 9 6 6 6-6" />
                             </svg>
                         </span>
                     </div>
@@ -151,7 +156,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                         </select>
                         <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m6 9 6 6 6-6"/>
+                                <path d="m6 9 6 6 6-6" />
                             </svg>
                         </span>
                     </div>
@@ -161,8 +166,8 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 <div className="flex flex-col gap-2">
                     <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect width="20" height="16" x="2" y="4" rx="2"/>
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                         </svg>
                         Notificaciones por Email
                     </label>
@@ -195,8 +200,8 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                             {emails.map((e) => (
                                 <li key={e.direccion} className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-3 py-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-400">
-                                        <rect width="20" height="16" x="2" y="4" rx="2"/>
-                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                                        <rect width="20" height="16" x="2" y="4" rx="2" />
+                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                                     </svg>
                                     <span className="flex-1 break-all">{e.direccion}</span>
                                     <button
@@ -206,7 +211,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                                         aria-label={`Eliminar ${e.direccion}`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                                            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
                                         </svg>
                                     </button>
                                 </li>
@@ -219,9 +224,9 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 {hasChanges && (
                     <div className="flex gap-3 bg-amber-50 border border-amber-300 rounded-md px-4 py-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-amber-500 mt-0.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" x2="12" y1="8" y2="12"/>
-                            <line x1="12" x2="12.01" y1="16" y2="16"/>
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" x2="12" y1="8" y2="12" />
+                            <line x1="12" x2="12.01" y1="16" y2="16" />
                         </svg>
                         <div className="flex flex-col gap-1">
                             <p className="text-sm font-bold text-amber-700">Cambios pendientes</p>
@@ -238,14 +243,13 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 <button
                     onClick={handleConfirm}
                     disabled={!hasChanges}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
-                        hasChanges
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${hasChanges
                             ? 'bg-blue-600 text-white hover:bg-blue-700'
                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    }`}
+                        }`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6 9 17l-5-5"/>
+                        <path d="M20 6 9 17l-5-5" />
                     </svg>
                     Confirmar configuraciones
                 </button>
