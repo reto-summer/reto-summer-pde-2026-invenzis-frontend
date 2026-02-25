@@ -1,5 +1,5 @@
 /**
- * Tipos de respuestas de la API (familia, subfamilia). id se usa en GET /licitaciones.
+ * Tipos de respuestas de la API.
  */
 
 export interface Familia {
@@ -15,4 +15,16 @@ export interface Subfamilia {
 
 export interface EmailConfig {
   direccion: string;
+}
+
+export interface NotificacionResumen {
+  id: number;
+  title: string;
+  success: boolean;
+  executionDate: string;
+}
+
+export interface NotificacionDetalle extends NotificacionResumen {
+  detail: string | null;
+  content: string | null;
 }

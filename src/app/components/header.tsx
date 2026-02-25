@@ -1,3 +1,7 @@
+import { useState, useRef, useEffect } from "react";
+import { NotificationPanel } from "./NotificationPanel";
+import { getNotificaciones } from "../../api/notificaciones";
+
 interface HeaderProps {
   title?: string;
   subtitle?: string;
@@ -7,16 +11,36 @@ interface HeaderProps {
 
 export default function Header({
   title = "Radar de Licitaciones",
-  subtitle = "8 licitaciones disponibles",
+  subtitle = "Licitaciones disponibles",
   onSettingsClick,
   sidebarOpen = false,
 }: HeaderProps) {
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getNotificaciones()
+      .then((data) => setNotifCount(data.length))
+      .catch(() => setNotifCount(0));
+  }, []);
+
+  useEffect(() => {
+    if (!panelOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setPanelOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [panelOpen]);
+
   return (
     <header
-      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white transition-all duration-300 ${sidebarOpen ? 'left-[400px]' : 'left-0'
+      className={`fixed top-0 right-0 z-40 flex h-20 items-stretch bg-white transition-all duration-300 ${sidebarOpen ? "left-[400px]" : "left-0"
         }`}
     >
-      {/* Single content row with same padding as Filters (px-4 md:px-6) */}
       <div className="flex flex-1 items-center gap-4 px-4 md:px-6">
 
         {/* Gear — hidden when sidebar is open */}
@@ -50,10 +74,46 @@ export default function Header({
           className="h-10 w-30 shrink-0 rounded object-contain"
         />
 
-        {/* Title + Subtitle pushed to far right */}
-        <div className="ml-auto flex flex-col items-end min-w-0 pl-2">
-          <h1 className="text-sm sm:text-xl font-bold text-gray-900 truncate">{title}</h1>
-          <p className="text-xs text-blue-500 truncate">{subtitle}</p>
+        {/* Title + Subtitle + Bell pushed to far right */}
+        <div className="ml-auto flex items-center gap-3 min-w-0">
+          <div className="flex flex-col items-end min-w-0">
+            <h1 className="text-sm sm:text-xl font-bold text-gray-900 truncate">{title}</h1>
+            <p className="text-xs text-blue-500 truncate">{subtitle}</p>
+          </div>
+
+          {/* Bell icon with notification panel */}
+          <div className="relative shrink-0" ref={panelRef}>
+            <button
+              type="button"
+              onClick={() => setPanelOpen((v) => !v)}
+              className="relative p-1.5 text-gray-400 hover:text-gray-700 transition-colors"
+              aria-label="Ver notificaciones"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+              </svg>
+              {notifCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none px-1">
+                  {notifCount > 99 ? "99+" : notifCount}
+                </span>
+              )}
+            </button>
+
+            {panelOpen && (
+              <NotificationPanel onClose={() => setPanelOpen(false)} />
+            )}
+          </div>
         </div>
       </div>
     </header>
