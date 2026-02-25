@@ -73,7 +73,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
     };
 
     return (
-        <aside className="w-full sm:w-[400px] h-screen bg-white px-6 py-6 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-200 text-slate-900">
+        <aside className="inset-x-0 sm:right-auto sm:w-[400px] h-screen bg-white px-6 py-6 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-200 text-slate-900">
             {/* Header */}
             <div className="mb-6">
                 <div className="flex items-center gap-3">
@@ -98,7 +98,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
                 </p>
             </div>
 
-            <div className="flex-1 flex flex-col gap-5 overflow-y-auto no-scrollbar pb-4">
+            <div className="flex-1 flex flex-col gap-5 overflow-y-auto no-scrollbar pb-4 px-1">
                 {/* Familia */}
                 <div className="flex flex-col gap-2">
                     <label htmlFor="familia" className="text-xs font-bold text-slate-500 uppercase tracking-widest">
