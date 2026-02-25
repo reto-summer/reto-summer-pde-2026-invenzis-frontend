@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { Bid } from "../types/Bid";
 import type { FiltersState } from "../types/filters";
 import { DEFAULT_FILTERS } from "../types/filters";
-import { getLicitaciones } from "../../api/licitaciones";
+import { useLicitaciones } from "../hooks/useLicitaciones";
 
 interface AppState {
   bids: Bid[];
@@ -31,34 +31,21 @@ export const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [bids, setBids] = useState<Bid[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [familiaCod, setFamiliaCodState] = useState<string | null>(null);
   const [subfamiliaCod, setSubfamiliaCod] = useState<string | null>(null);
 
-  // Cargar licitaciones desde la API al montar
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getLicitaciones({ familia: filters.familia, subfamilia: filters.subfamilia });
-        setBids(data);
-        setSuccess(true);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Error al cargar licitaciones");
-        setBids([]);
-        setSuccess(false);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Usar useLicitaciones para cargar datos desde la API
+  const { licitaciones, loading, error } = useLicitaciones({
+    familia: filters.familia,
+    subfamilia: filters.subfamilia,
+  });
 
-    fetchInitialData();
-  }, [filters.familia, filters.subfamilia]);
+  // Sincronizar licitaciones cargadas con el estado de bids
+  useEffect(() => {
+    setBids(licitaciones);
+  }, [licitaciones]);
 
   const setFiltrosCascada = useCallback((fam: string | null, sub: string | null) => {
     setFamiliaCodState(fam);
@@ -71,15 +58,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         bids,
         loading,
         error,
-        success,
+        success: true,
         filters,
         sidebarOpen,
         familiaCod,
         subfamiliaCod,
         setBids,
-        setLoading,
-        setError,
-        setSuccess,
+        setLoading: () => { },
+        setError: () => { },
+        setSuccess: () => { },
         setFilters,
         setSidebarOpen,
         setFiltrosCascada,

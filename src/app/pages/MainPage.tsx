@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useLicitaciones } from "../hooks/useLicitaciones";
 import { DEFAULT_FILTERS } from "../types/filters";
+import type { Bid } from "../types/Bid";
 import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
 import { BidCard } from "../components/BidCard";
@@ -104,7 +105,7 @@ export default function MainPage() {
                 onClear={handleClearFilters}
               />
             ) : (
-              filteredBids.map((bid) => (
+              filteredBids.map((bid: Bid) => (
                 <BidCard key={bid.id_licitacion} bid={bid} />
               ))
             )}
