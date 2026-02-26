@@ -48,8 +48,10 @@ export default function MainPage() {
         filters.dateRanges.length === 0 ||
         filters.dateRanges.some((range) => {
           switch (range) {
+            case "today":
+              return hours >= 0 && hours < 24;
             case "under_7":
-              return hours <= 168;
+              return hours >= 0 && hours <= 168;
             case "7_15":
               return hours > 168 && hours <= 360;
             case "over_15":
