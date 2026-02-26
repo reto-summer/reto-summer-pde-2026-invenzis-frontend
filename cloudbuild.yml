@@ -6,6 +6,7 @@ substitutions:
   _SERVICE: qa-reto-summer-pde-2026-frontend
   _AR_REPO: reto-summer-pde-2026
   _IMAGE: qa-reto-summer-pde-2026-frontend
+  _API_BASE_URL: https://qa-reto-summer-pde-2026-backend-133459896240.us-east1.run.app
 
 steps:
   # Build
@@ -14,6 +15,7 @@ steps:
       - build
       - -t
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE}:$SHORT_SHA
+      - API_BASE_URL=${_API_BASE_URL}
       - .
 
   # Push
