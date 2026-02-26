@@ -5,6 +5,7 @@
 
 const getBaseUrl = (): string => {
   const url = __API_BASE_URL__;
+  console.log("API_BASE_URL cargada:", url); // <- Temporal para debug
   if (!url) {
     throw new Error("API_BASE_URL environment variable is required");
   }
