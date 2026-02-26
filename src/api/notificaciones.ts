@@ -29,7 +29,7 @@ export async function getNotificaciones(fechaEjecucion?: string): Promise<Notifi
     success: item.exito ?? false,
     executionDate: item.fechaEjecucion ?? "",
   }));
-}
+} 
 
 export async function getNotificacion(id: number): Promise<NotificacionDetalle> {
   const data = await api.get<NotificacionBackendDetalle>(`${NOTIFICACIONES_PATH}/${id}`);
