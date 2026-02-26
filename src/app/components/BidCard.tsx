@@ -21,6 +21,18 @@ function getUrgencyLabel(hours: number): string {
   return `${days}d restantes`;
 }
 
+//para probar lo que llega del back
+function formatDate(dateString: string): string {
+  if (!dateString) return "N/A";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "N/A";
+    return date.toLocaleDateString("es-AR");
+  } catch {
+    return "N/A";
+  }
+}
+
 export function BidCard({ bid }: BidCardProps) {
   const hoursToClose = getHoursToClose(bid.fecha_cierre);
 
@@ -56,11 +68,11 @@ export function BidCard({ bid }: BidCardProps) {
       <div className="flex items-center justify-between text-xs text-slate-500">
         <p>
           <span className="font-semibold">Cierre:</span>{" "}
-          {new Date(bid.fecha_cierre).toLocaleDateString("es-AR")}
+          {formatDate(bid.fecha_cierre)}
         </p>
         <p>
           <span className="font-semibold">Publicación:</span>{" "}
-          {new Date(bid.fecha_publicacion).toLocaleDateString("es-AR")}
+          {formatDate(bid.fecha_publicacion)}
         </p>
       </div>
     </a>
