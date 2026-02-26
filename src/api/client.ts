@@ -1,12 +1,14 @@
 /**
  * Cliente HTTP base para la API del backend.
- * Base URL: VITE_API_BASE_URL (.env). api.get<T>(path, config?) con params → query string.
+ * Base URL: API_BASE_URL (.env). api.get<T>(path, config?) con params → query string.
  */
 
 const getBaseUrl = (): string => {
-  const url = import.meta.env.VITE_API_BASE_URL;
-  if (url) return url.replace(/\/$/, "");
-  return "https://qa-reto-summer-pde-2026-invenzis-backend-133459896240.us-east1.run.app";
+  const url = __API_BASE_URL__;
+  if (!url) {
+    throw new Error("API_BASE_URL environment variable is required");
+  }
+  return url.replace(/\/$/, "");
 };
 
 const BASE_URL = getBaseUrl();
