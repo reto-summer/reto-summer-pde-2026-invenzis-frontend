@@ -33,8 +33,8 @@ export interface LicitacionBackendResponse {
   titulo?: string;
   tipoLicitacion?: string;
   descripcion?: string;
-  fechaPublicacion?: string;
   fechaCierre?: string;
+  fecha_publicacion?: string;
   link?: string;
   familia?: Familia;
   subfamilia?: Subfamilia;

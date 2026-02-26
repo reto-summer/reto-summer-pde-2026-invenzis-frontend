@@ -14,8 +14,8 @@ export interface Bid {
   id_licitacion: number;
   title: string;
   description: string;
-  fecha_publicacion: string; // YYYY-MM-DD
-  fecha_cierre: string; // YYYY-MM-DDTHH:MM:SS
+  fecha_publicacion: string; // ISO 8601 datetime
+  fecha_cierre: string; // ISO 8601 datetime
   link: string;
   familia: Familia;
   subfamilia: Subfamilia;
