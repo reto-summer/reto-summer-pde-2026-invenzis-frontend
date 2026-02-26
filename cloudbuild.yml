@@ -15,6 +15,7 @@ steps:
       - build
       - -t
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE}:$SHORT_SHA
+      - --build-arg
       - API_BASE_URL=${_API_BASE_URL}
       - .
 
