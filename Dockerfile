@@ -2,6 +2,11 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# DECLARAR EL ARGUMENTO AQUÍ
+ARG API_BASE_URL
+# Convertirlo en variable de entorno para que Vite lo vea
+ENV VITE_API_BASE_URL=$API_BASE_URL
+
 # Instala deps de forma reproducible
 COPY package*.json ./
 RUN npm ci
