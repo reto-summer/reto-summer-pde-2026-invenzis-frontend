@@ -4,18 +4,29 @@ import type { FiltersState } from "../app/types/filters";
 import type { LicitacionBackendResponse } from "./types";
 
 /**
- * Query para GET /licitaciones. Solo se envían los filtros activos.
- * familia y subfamilia son requeridos según la especificación.
- * clase, subclase, fecha_publicacion y fecha_cierre son opcionales.
- * fecha_publicacion: YYYY-MM-DD
- * fecha_cierre: YYYY-MM-DDTHH:MM:SS
+ * Query params según contrato V1.1 para GET /licitaciones.
+ * familiaCod/subfamiliaCod: int
+ * fechaPublicacionDesde/Hasta: YYYY-MM-DD
+ * fechaCierreDesde/Hasta: YYYY-MM-DDTHH:MM:SS
  */
 export interface LicitacionesQuery {
     [key: string]: string | number | undefined;
+    familiaCod?: number;
+    subfamiliaCod?: number;
+    fechaPublicacionDesde?: string;
+    fechaPublicacionHasta?: string;
+    fechaCierreDesde?: string;
+    fechaCierreHasta?: string;
+}
+
+/**
+ * Query params temporales (get/all) — familia y subfamilia sin renombrar.
+ * @deprecated Usar LicitacionesQuery con familiaCod/subfamiliaCod según contrato V1.1.
+ */
+export interface LicitacionesQueryAll {
+    [key: string]: string | number | undefined;
     familia?: number;
     subfamilia?: number;
-    fecha_publicacion?: string;
-    fecha_cierre?: string;
 }
 
 /**
@@ -23,8 +34,8 @@ export interface LicitacionesQuery {
  */
 export function filtersToQuery(filters: Partial<FiltersState>): LicitacionesQuery {
     const query: LicitacionesQuery = {};
-    if (filters.familia && filters.familia > 0) query.familia = filters.familia;
-    if (filters.subfamilia && filters.subfamilia > 0) query.subfamilia = filters.subfamilia;
+    if (filters.familia && filters.familia > 0) query.familiaCod = filters.familia;
+    if (filters.subfamilia && filters.subfamilia > 0) query.subfamiliaCod = filters.subfamilia;
     return query;
 }
 
@@ -49,11 +60,22 @@ function mapBackendToBid(response: LicitacionBackendResponse): Bid {
 }
 
 /**
- * GET /licitaciones — Lista filtrada
+ * GET /licitaciones — Temporal (get/all). Respuesta como array directo.
+ * @deprecated Reemplazar por getLicitaciones() cuando el backend esté alineado con contrato V1.1.
  */
-export async function getLicitaciones(query: LicitacionesQuery = {}): Promise<Bid[]> {
+export async function getLicitacionesTodas(query: LicitacionesQueryAll = {}): Promise<Bid[]> {
     const response = await api.get<LicitacionBackendResponse[]>("/licitaciones", { params: query });
     return response.map(mapBackendToBid);
+}
+
+/**
+ * GET /licitaciones — Según contrato V1.1.
+ * Filtros: familiaCod, subfamiliaCod, fechaPublicacionDesde/Hasta, fechaCierreDesde/Hasta.
+ * Respuesta: { licitaciones: Licitacion[] }
+ */
+export async function getLicitaciones(query: LicitacionesQuery = {}): Promise<Bid[]> {
+    const response = await api.get<{ licitaciones: LicitacionBackendResponse[] }>("/licitaciones", { params: query });
+    return (response?.licitaciones ?? []).map(mapBackendToBid);
 }
 
 /**
@@ -62,12 +84,4 @@ export async function getLicitaciones(query: LicitacionesQuery = {}): Promise<Bi
 export async function getLicitacionById(id_licitacion: number): Promise<Bid> {
     const response = await api.get<LicitacionBackendResponse>(`/licitaciones/${id_licitacion}`);
     return mapBackendToBid(response);
-}
-
-/**
- * GET /licitaciones/titulo/:titulo — Buscar por título exacto
- */
-export async function getLicitacionesByTitulo(titulo: string): Promise<Bid[]> {
-    const response = await api.get<LicitacionBackendResponse[]>(`/licitaciones/titulo/${encodeURIComponent(titulo)}`);
-    return response.map(mapBackendToBid);
 }
