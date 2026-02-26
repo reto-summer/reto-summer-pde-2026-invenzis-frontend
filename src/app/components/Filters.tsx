@@ -287,20 +287,35 @@ function PlazoPill({ value, onChange }: { value: FiltersState; onChange: (f: Fil
   );
 }
 
-// ─── FechaPill — desktop popover with mini-calendars ─────────────────────────
+// ─── Shared popover actions ───────────────────────────────────────────────────
 
-function FechaPill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
+function PopoverActions({ onClear, onApply }: { onClear: () => void; onApply: () => void }) {
+  return (
+    <div className="flex justify-end gap-2 pt-1 border-t border-slate-100">
+      <button
+        type="button"
+        onClick={onClear}
+        className="py-1.5 px-3 rounded-md border border-red-500 bg-white text-red-500 text-xs font-semibold hover:bg-red-50 transition-all focus:outline-none"
+      >
+        Limpiar
+      </button>
+      <button
+        type="button"
+        onClick={onApply}
+        className="py-1.5 px-3 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all focus:outline-none"
+      >
+        Aplicar
+      </button>
+    </div>
+  );
+}
+
+// ─── PublicacionPill ──────────────────────────────────────────────────────────
+
+function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"publicacion" | "cierre">("publicacion");
-
-  // Independent local state for each mode
-  const [desdePublicacion, setDesdePublicacion] = useState("");
-  const [hastaPublicacion, setHastaPublicacion] = useState("");
-  const [desdeCierre, setDesdeCierre]           = useState("");
-  const [hastaCierre, setHastaCierre]           = useState("");
-  const [horaDesde, setHoraDesde]               = useState("00:00");
-  const [horaHasta, setHoraHasta]               = useState("23:59");
-
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -313,73 +328,36 @@ function FechaPill({ value, onChange }: { value: FiltersState; onChange: (f: Fil
   }, [open]);
 
   function handleOpen() {
-    // Load all fields independently — no mode clears the other
-    setDesdePublicacion(value.fechaPublicacionDesde ?? "");
-    setHastaPublicacion(value.fechaPublicacionHasta ?? "");
-    setDesdeCierre(value.fechaCierreDesde?.split("T")[0] ?? "");
-    setHastaCierre(value.fechaCierreHasta?.split("T")[0] ?? "");
-    setHoraDesde(value.fechaCierreDesde?.split("T")[1]?.slice(0, 5) ?? "00:00");
-    setHoraHasta(value.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59");
+    setDesde(value.fechaPublicacionDesde ?? "");
+    setHasta(value.fechaPublicacionHasta ?? "");
     setOpen(true);
   }
 
   function handleApply() {
-    // Save both modes independently — neither clears the other
-    onChange({
-      ...value,
-      fechaPublicacionDesde: desdePublicacion,
-      fechaPublicacionHasta: hastaPublicacion,
-      fechaCierreDesde: desdeCierre ? buildDatetime(desdeCierre, horaDesde) : "",
-      fechaCierreHasta: hastaCierre ? buildDatetime(hastaCierre, horaHasta) : "",
-    });
+    onChange({ ...value, fechaPublicacionDesde: desde, fechaPublicacionHasta: hasta });
     setOpen(false);
   }
 
   function handleClear() {
-    setDesdePublicacion(""); setHastaPublicacion("");
-    setDesdeCierre(""); setHastaCierre("");
-    setHoraDesde("00:00"); setHoraHasta("23:59");
-    onChange({ ...value, fechaPublicacionDesde: "", fechaPublicacionHasta: "", fechaCierreDesde: "", fechaCierreHasta: "" });
+    setDesde(""); setHasta("");
+    onChange({ ...value, fechaPublicacionDesde: "", fechaPublicacionHasta: "" });
     setOpen(false);
   }
 
-  const hasPub    = !!value.fechaPublicacionDesde || !!value.fechaPublicacionHasta;
-  const hasCierre = !!value.fechaCierreDesde || !!value.fechaCierreHasta;
-  const isActive  = hasPub || hasCierre;
-
-  let pillLabel = "Fecha";
-  if (hasPub && hasCierre) {
-    pillLabel = "Pub. + Cierre";
-  } else if (hasPub) {
+  const isActive = !!value.fechaPublicacionDesde || !!value.fechaPublicacionHasta;
+  let pillLabel = "Publicación";
+  if (isActive) {
     const f = formatShort(value.fechaPublicacionDesde ?? "");
     const t = formatShort(value.fechaPublicacionHasta ?? "");
     pillLabel = f && t ? `Pub. ${f} → ${t}` : f ? `Pub. desde ${f}` : `Pub. hasta ${t}`;
-  } else if (hasCierre) {
-    const f = formatShort(value.fechaCierreDesde ?? "");
-    const t = formatShort(value.fechaCierreHasta ?? "");
-    pillLabel = f && t ? `Cierre ${f} → ${t}` : f ? `Cierre desde ${f}` : `Cierre hasta ${t}`;
   }
 
-  // Current mode's desde/hasta
-  const currentDesde    = mode === "publicacion" ? desdePublicacion : desdeCierre;
-  const currentHasta    = mode === "publicacion" ? hastaPublicacion : hastaCierre;
-  const setCurrentDesde = mode === "publicacion" ? setDesdePublicacion : setDesdeCierre;
-  const setCurrentHasta = mode === "publicacion" ? setHastaPublicacion : setHastaCierre;
-
-  // Calendar initial views for current mode
-  const today        = new Date();
-  const desdeInit    = currentDesde ? new Date(currentDesde + "T12:00:00") : today;
-  const hastaInitRaw = currentHasta
-    ? new Date(currentHasta + "T12:00:00")
-    : new Date(desdeInit.getFullYear(), desdeInit.getMonth() + 1, 1);
-  const desdeInitYear  = desdeInit.getFullYear();
-  const desdeInitMonth = desdeInit.getMonth();
-  const hastaInitYear  = hastaInitRaw.getFullYear();
-  const hastaInitMonth = hastaInitRaw.getMonth();
+  const today = new Date();
+  const desdeInit    = desde ? new Date(desde + "T12:00:00") : today;
+  const hastaInitRaw = hasta ? new Date(hasta + "T12:00:00") : new Date(desdeInit.getFullYear(), desdeInit.getMonth() + 1, 1);
 
   return (
     <div className="relative" ref={ref}>
-      {/* Trigger pill */}
       <button
         type="button"
         onClick={handleOpen}
@@ -394,88 +372,141 @@ function FechaPill({ value, onChange }: { value: FiltersState; onChange: (f: Fil
         <span>{pillLabel}</span>
       </button>
 
-      {/* Popover */}
       {open && (
-        <div className="absolute top-full mt-2 left-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 p-5 flex flex-col gap-4 w-auto">
-          {/* Segmented toggle — dot indicator when inactive tab has data */}
-          <div className="flex rounded-md border border-slate-200 overflow-hidden text-sm font-medium">
-            {(["publicacion", "cierre"] as const).map((m) => {
-              const tabHasData = m === "publicacion"
-                ? (!!desdePublicacion || !!hastaPublicacion)
-                : (!!desdeCierre || !!hastaCierre);
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setMode(m)}
-                  className={`flex-1 py-1.5 px-4 transition-all focus:outline-none inline-flex items-center justify-center gap-1.5
-                    ${mode === m ? "bg-blue-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}
-                >
-                  {m === "publicacion" ? "Publicación" : "Cierre"}
-                  {tabHasData && mode !== m && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Two mini-calendars — keyed by mode so internal state resets on tab switch */}
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 p-5 flex flex-col gap-4 w-auto">
           <div className="flex gap-6">
             <MiniCalendar
-              key={`desde-${mode}`}
               label="Desde"
-              selected={currentDesde}
-              rangeStart={currentDesde}
-              rangeEnd={currentHasta}
-              onSelect={setCurrentDesde}
-              initYear={desdeInitYear}
-              initMonth={desdeInitMonth}
+              selected={desde}
+              rangeStart={desde}
+              rangeEnd={hasta}
+              onSelect={setDesde}
+              initYear={desdeInit.getFullYear()}
+              initMonth={desdeInit.getMonth()}
             />
             <div className="w-px bg-slate-200 self-stretch" />
             <MiniCalendar
-              key={`hasta-${mode}`}
               label="Hasta"
-              selected={currentHasta}
-              rangeStart={currentDesde}
-              rangeEnd={currentHasta}
-              onSelect={setCurrentHasta}
-              initYear={hastaInitYear}
-              initMonth={hastaInitMonth}
+              selected={hasta}
+              rangeStart={desde}
+              rangeEnd={hasta}
+              onSelect={setHasta}
+              initYear={hastaInitRaw.getFullYear()}
+              initMonth={hastaInitRaw.getMonth()}
             />
           </div>
+          <PopoverActions onClear={handleClear} onApply={handleApply} />
+        </div>
+      )}
+    </div>
+  );
+}
 
-          {/* Time inputs — only for Cierre */}
-          {mode === "cierre" && (
-            <div className="flex gap-4 pt-1 border-t border-slate-100">
-              <div className="flex flex-col gap-1 flex-1">
-                <label className={labelClass}>Hora desde</label>
-                <input type="time" value={horaDesde} onChange={(e) => setHoraDesde(e.target.value)} className={inputClass} />
-              </div>
-              <div className="flex flex-col gap-1 flex-1">
-                <label className={labelClass}>Hora hasta</label>
-                <input type="time" value={horaHasta} onChange={(e) => setHoraHasta(e.target.value)} className={inputClass} />
-              </div>
-            </div>
-          )}
+// ─── CierrePill ───────────────────────────────────────────────────────────────
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-1 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={handleClear}
-              className="py-1.5 px-3 rounded-md border border-red-500 bg-white text-red-500 text-xs font-semibold hover:bg-red-50 transition-all focus:outline-none"
-            >
-              Limpiar
-            </button>
-            <button
-              type="button"
-              onClick={handleApply}
-              className="py-1.5 px-3 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all focus:outline-none"
-            >
-              Aplicar
-            </button>
+function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
+  const [open, setOpen]         = useState(false);
+  const [desde, setDesde]       = useState("");
+  const [hasta, setHasta]       = useState("");
+  const [horaDesde, setHoraDesde] = useState("00:00");
+  const [horaHasta, setHoraHasta] = useState("23:59");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  function handleOpen() {
+    setDesde(value.fechaCierreDesde?.split("T")[0] ?? "");
+    setHasta(value.fechaCierreHasta?.split("T")[0] ?? "");
+    setHoraDesde(value.fechaCierreDesde?.split("T")[1]?.slice(0, 5) ?? "00:00");
+    setHoraHasta(value.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59");
+    setOpen(true);
+  }
+
+  function handleApply() {
+    onChange({
+      ...value,
+      fechaCierreDesde: desde ? buildDatetime(desde, horaDesde) : "",
+      fechaCierreHasta: hasta ? buildDatetime(hasta, horaHasta) : "",
+    });
+    setOpen(false);
+  }
+
+  function handleClear() {
+    setDesde(""); setHasta("");
+    setHoraDesde("00:00"); setHoraHasta("23:59");
+    onChange({ ...value, fechaCierreDesde: "", fechaCierreHasta: "" });
+    setOpen(false);
+  }
+
+  const isActive = !!value.fechaCierreDesde || !!value.fechaCierreHasta;
+  let pillLabel = "Cierre";
+  if (isActive) {
+    const f = formatShort(value.fechaCierreDesde ?? "");
+    const t = formatShort(value.fechaCierreHasta ?? "");
+    pillLabel = f && t ? `Cierre ${f} → ${t}` : f ? `Cierre desde ${f}` : `Cierre hasta ${t}`;
+  }
+
+  const today = new Date();
+  const desdeInit    = desde ? new Date(desde + "T12:00:00") : today;
+  const hastaInitRaw = hasta ? new Date(hasta + "T12:00:00") : new Date(desdeInit.getFullYear(), desdeInit.getMonth() + 1, 1);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={handleOpen}
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm font-medium transition-all
+          focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+          ${isActive
+            ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
+            : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+          }`}
+      >
+        <CalendarIcon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
+        <span>{pillLabel}</span>
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 p-5 flex flex-col gap-4 w-auto">
+          <div className="flex gap-6">
+            <MiniCalendar
+              label="Desde"
+              selected={desde}
+              rangeStart={desde}
+              rangeEnd={hasta}
+              onSelect={setDesde}
+              initYear={desdeInit.getFullYear()}
+              initMonth={desdeInit.getMonth()}
+            />
+            <div className="w-px bg-slate-200 self-stretch" />
+            <MiniCalendar
+              label="Hasta"
+              selected={hasta}
+              rangeStart={desde}
+              rangeEnd={hasta}
+              onSelect={setHasta}
+              initYear={hastaInitRaw.getFullYear()}
+              initMonth={hastaInitRaw.getMonth()}
+            />
           </div>
+          <div className="flex gap-4 pt-1 border-t border-slate-100">
+            <div className="flex flex-col gap-1 flex-1">
+              <label className={labelClass}>Hora desde</label>
+              <input type="time" value={horaDesde} onChange={(e) => setHoraDesde(e.target.value)} className={inputClass} />
+            </div>
+            <div className="flex flex-col gap-1 flex-1">
+              <label className={labelClass}>Hora hasta</label>
+              <input type="time" value={horaHasta} onChange={(e) => setHoraHasta(e.target.value)} className={inputClass} />
+            </div>
+          </div>
+          <PopoverActions onClear={handleClear} onApply={handleApply} />
         </div>
       )}
     </div>
@@ -508,13 +539,6 @@ export function Filters({ value, onChange }: FiltersProps) {
     onChange({ ...value, tenderTypes: next });
   };
 
-  const toggleDateRange = (key: DateRangeKey) => {
-    const next = value.dateRanges.includes(key)
-      ? value.dateRanges.filter((d) => d !== key)
-      : [...value.dateRanges, key];
-    onChange({ ...value, dateRanges: next });
-  };
-
   const handleClear = () => onChange(DEFAULT_FILTERS);
 
   // ── Mobile handlers (update local state only) ──
@@ -527,7 +551,7 @@ export function Filters({ value, onChange }: FiltersProps) {
         ? f.tenderTypes.filter((t) => t !== key)
         : [...f.tenderTypes, key];
       return { ...f, tenderTypes: next };
-    });
+    }); 
 
   const mobileToggleDateRange = (key: DateRangeKey) =>
     setMobileFilters((f) => {
@@ -735,8 +759,9 @@ export function Filters({ value, onChange }: FiltersProps) {
             {/* Plazo de cierre — pill desplegable */}
             <PlazoPill value={value} onChange={onChange} />
 
-            {/* Fecha pill con mini-calendarios */}
-            <FechaPill value={value} onChange={onChange} />
+            {/* Fecha publicación y cierre — pills independientes */}
+            <PublicacionPill value={value} onChange={onChange} />
+            <CierrePill value={value} onChange={onChange} />
 
             {/* Limpiar */}
             <button type="button" onClick={handleClear} disabled={!hasActiveFilters}
