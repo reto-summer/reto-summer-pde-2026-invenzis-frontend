@@ -28,6 +28,18 @@ export interface NotificacionDetalle extends NotificacionResumen {
   detail: string | null;
   content: string | null;
 }
+
+export interface NotificacionBackendResumen {
+  id: number;
+  titulo?: string;
+  exito?: boolean;
+  fechaEjecucion?: string;
+}
+
+export interface NotificacionBackendDetalle extends NotificacionBackendResumen {
+  detalle?: string | null;
+  contenido?: string | null;
+}
 export interface LicitacionBackendResponse {
   idLicitacion: number;
   titulo?: string;
