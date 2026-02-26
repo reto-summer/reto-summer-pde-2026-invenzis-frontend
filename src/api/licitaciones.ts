@@ -44,7 +44,7 @@ function mapBackendToBid(response: LicitacionBackendResponse): Bid {
         id_licitacion: response.idLicitacion,
         title: response.titulo ?? "",
         description: response.descripcion ?? "",
-        fecha_publicacion: response.fecha_publicacion ?? "",
+        fecha_publicacion: response.fechaPublicacion ?? "",
         fecha_cierre: response.fechaCierre ?? "",
         link: response.link ?? "",
         familia: {
