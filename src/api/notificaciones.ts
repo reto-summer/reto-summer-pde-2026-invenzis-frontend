@@ -4,7 +4,12 @@
  */
 
 import { api } from "./client";
-import type { NotificacionResumen, NotificacionDetalle } from "./types";
+import type {
+  NotificacionResumen,
+  NotificacionDetalle,
+  NotificacionBackendResumen,
+  NotificacionBackendDetalle,
+} from "./types";
 
 const NOTIFICACIONES_PATH = "/notificacion";
 
@@ -14,12 +19,26 @@ function getLastWeekISO(): string {
 
 export async function getNotificaciones(fechaEjecucion?: string): Promise<NotificacionResumen[]> {
   const fecha = fechaEjecucion ?? getLastWeekISO();
-  const data = await api.get<NotificacionResumen[]>(NOTIFICACIONES_PATH, {
+  const data = await api.get<NotificacionBackendResumen[]>(NOTIFICACIONES_PATH, {
     params: { fechaEjecucion: fecha },
   });
-  return Array.isArray(data) ? data : [];
-}
+  if (!Array.isArray(data)) return [];
+  return data.map((item) => ({
+    id: item.id,
+    title: item.titulo ?? "",
+    success: item.exito ?? false,
+    executionDate: item.fechaEjecucion ?? "",
+  }));
+} 
 
 export async function getNotificacion(id: number): Promise<NotificacionDetalle> {
-  return api.get<NotificacionDetalle>(`${NOTIFICACIONES_PATH}/${id}`);
+  const data = await api.get<NotificacionBackendDetalle>(`${NOTIFICACIONES_PATH}/${id}`);
+  return {
+    id: data.id,
+    title: data.titulo ?? "",
+    success: data.exito ?? false,
+    executionDate: data.fechaEjecucion ?? "",
+    detail: data.detalle ?? null,
+    content: data.contenido ?? null,
+  };
 }
