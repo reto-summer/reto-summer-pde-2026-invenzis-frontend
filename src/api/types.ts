@@ -40,6 +40,7 @@ export interface NotificacionBackendDetalle extends NotificacionBackendResumen {
   detalle?: string | null;
   contenido?: string | null;
 }
+
 export interface LicitacionBackendResponse {
   idLicitacion: number;
   titulo?: string;
