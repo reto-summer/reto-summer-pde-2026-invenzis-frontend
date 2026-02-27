@@ -5,7 +5,7 @@ export function useBids() {
   const { bids, loading, error, success, filters } = useAppContext();
 
   const filteredBids = useMemo(() => {
-    return bids.filter((bid) => {
+    return Object.values(bids).filter((bid) => {
       const title = bid.title ?? "";
       const description = bid.description ?? "";
       const matchesSearch =
@@ -15,18 +15,7 @@ export function useBids() {
 
       const matchesType =
         filters.tenderTypes.length === 0 ||
-        filters.tenderTypes.some((type) => {
-          switch (type) {
-            case "licitacion_publica":
-              return title.includes("Licitación Pública");
-            case "compra_directa":
-              return title.includes("Compra Directa");
-            case "licitacion_abreviada":
-              return title.includes("Licitación Abreviada");
-            default:
-              return false;
-          }
-        });
+        filters.tenderTypes.includes(bid.tipoLicitacion ?? "");
 
       const hours =
         (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
@@ -34,8 +23,10 @@ export function useBids() {
         filters.dateRanges.length === 0 ||
         filters.dateRanges.some((range) => {
           switch (range) {
+            case "today":
+              return hours >= 0 && hours < 24;
             case "under_7":
-              return hours <= 168;
+              return hours >= 0 && hours <= 168;
             case "7_15":
               return hours > 168 && hours <= 360;
             case "over_15":

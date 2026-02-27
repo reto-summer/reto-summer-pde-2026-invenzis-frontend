@@ -11,12 +11,25 @@ import { BidCardSkeleton } from "../components/ui/BidCardSkeleton";
 import { ErrorMessage } from "../components/ui/ErrorMessage";
 import { EmptyState } from "../components/ui/EmptyState";
 
+/** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
+function normalizeTipo(tipo: string): string {
+  return tipo.replace(/\d+/g, "").replace(/\//g, "").replace(/\s+/g, " ").trim();
+}
+
 export default function MainPage() {
   const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod } = useAppContext();
   const { licitaciones, loading, error } = useLicitaciones({
     familia: familiaCod ? Number(familiaCod) : undefined,
     subfamilia: subfamiliaCod ? Number(subfamiliaCod) : undefined,
   });
+
+  const availableTipos = useMemo(() => {
+    const set = new Set<string>();
+    for (const bid of licitaciones) {
+      if (bid.tipoLicitacion) set.add(normalizeTipo(bid.tipoLicitacion));
+    }
+    return Array.from(set).sort();
+  }, [licitaciones]);
 
   const filteredBids = useMemo(() => {
     return licitaciones.filter((bid) => {
@@ -29,18 +42,7 @@ export default function MainPage() {
 
       const matchesType =
         filters.tenderTypes.length === 0 ||
-        filters.tenderTypes.some((type) => {
-          switch (type) {
-            case "licitacion_publica":
-              return title.includes("Licitación Pública");
-            case "compra_directa":
-              return title.includes("Compra Directa");
-            case "licitacion_abreviada":
-              return title.includes("Licitación Abreviada");
-            default:
-              return false;
-          }
-        });
+        filters.tenderTypes.includes(normalizeTipo(bid.tipoLicitacion ?? ""));
 
       const hours =
         (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
@@ -89,7 +91,7 @@ export default function MainPage() {
         <div className="pt-20">
           {/* Filter bar — sticks below the header while scrolling */}
           <div className="sticky top-20 z-30">
-            <Filters value={filters} onChange={setFilters} />
+            <Filters value={filters} onChange={setFilters} availableTipos={availableTipos} />
           </div>
 
           {/* Bid cards list */}

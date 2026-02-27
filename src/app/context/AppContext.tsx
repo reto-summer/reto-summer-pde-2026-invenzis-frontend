@@ -6,7 +6,7 @@ import { DEFAULT_FILTERS } from "../types/filters";
 import { useLicitaciones } from "../hooks/useLicitaciones";
 
 interface AppState {
-  bids: Bid[];
+  bids: Record<number, Bid>;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -18,7 +18,7 @@ interface AppState {
 }
 
 interface AppContextType extends AppState {
-  setBids: (bids: Bid[]) => void;
+  setBids: (bids: Record<number, Bid>) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSuccess: (success: boolean) => void;
@@ -30,7 +30,7 @@ interface AppContextType extends AppState {
 export const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [bids, setBids] = useState<Bid[]>([]);
+  const [bids, setBids] = useState<Record<number, Bid>>({});
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [familiaCod, setFamiliaCodState] = useState<string | null>(null);
@@ -42,9 +42,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     subfamilia: filters.subfamilia,
   });
 
-  // Sincronizar licitaciones cargadas con el estado de bids
+  // Sincronizar licitaciones cargadas con el estado de bids (diccionario por id_licitacion)
   useEffect(() => {
-    setBids(licitaciones);
+    const dict = Object.fromEntries(licitaciones.map((b) => [b.id_licitacion, b]));
+    setBids(dict);
   }, [licitaciones]);
 
   const setFiltrosCascada = useCallback((fam: string | null, sub: string | null) => {
