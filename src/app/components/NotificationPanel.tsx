@@ -23,17 +23,17 @@ function StatusBadge({ success }: { success: boolean }) {
   return success ? (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200 shrink-0">
       <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-        <path d="m9 11 3 3L22 4"/>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <path d="m9 11 3 3L22 4" />
       </svg>
       Éxito
     </span>
   ) : (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200 shrink-0">
       <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="15" x2="9" y1="9" y2="15"/>
-        <line x1="9" x2="15" y1="9" y2="15"/>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="15" x2="9" y1="9" y2="15" />
+        <line x1="9" x2="15" y1="9" y2="15" />
       </svg>
       Error
     </span>
@@ -67,8 +67,8 @@ function NotificationItem({
         </div>
         <div className="flex items-center gap-1 text-xs text-slate-400">
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
           </svg>
           {formatDate(notif.executionDate)}
         </div>
@@ -111,7 +111,7 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
           aria-label="Cerrar notificaciones"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
           </svg>
         </button>
       </div>
@@ -119,25 +119,27 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
       {/* Vista detalle */}
       {detalleActual ? (
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 flex flex-col gap-4">
-          <button
-            type="button"
-            onClick={clearDetalle}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-all self-start"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
-            </svg>
-            Volver
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={clearDetalle}
+              className="inline-flex items-center p-2 rounded-md border border-slate-200 bg-white text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-all"
+              aria-label="Volver"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
+              </svg>
+            </button>
 
-          <h3 className="text-base font-bold text-slate-900 leading-snug">
-            {detalleActual.title}
-          </h3>
+            <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-1">
+              {detalleActual.title}
+            </h3>
+          </div>
 
           <div className="flex items-center gap-3 flex-wrap">
             <span className="inline-flex items-center gap-1 text-xs text-slate-400">
               <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
               </svg>
               {formatDate(detalleActual.executionDate)}
             </span>
