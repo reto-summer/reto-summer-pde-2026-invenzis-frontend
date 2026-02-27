@@ -19,12 +19,9 @@ function getLastWeekISO(): string {
 
 export async function getNotificaciones(fechaEjecucion?: string): Promise<NotificacionResumen[]> {
   const fecha = fechaEjecucion ?? getLastWeekISO();
-  console.log("🔔 getNotificaciones - fecha filtro:", fecha);
   const data = await api.get<NotificacionBackendResumen[]>(NOTIFICACIONES_PATH, {
     params: { fechaEjecucion: fecha },
   });
-  console.log("🔔 getNotificaciones - respuesta:", data);
-  console.log("🔔 getNotificaciones - cantidad:", Array.isArray(data) ? data.length : "NO ES ARRAY");
   if (!Array.isArray(data)) return [];
   return data.map((item) => ({
     id: item.id,
@@ -44,6 +41,5 @@ export async function getNotificacion(id: number): Promise<NotificacionDetalle> 
     detail: data.detalle ?? null,
     content: data.contenido ?? null,
   };
-  console.log("🔔 getNotificacion - mapped result:", result);
   return result;
 }
