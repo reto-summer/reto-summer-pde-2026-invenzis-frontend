@@ -31,6 +31,7 @@ export interface UseNotificacionesResult {
   unreadCount: number;
   isRead: (id: number) => boolean;
   markAsRead: (id: number) => void;
+  markAllAsRead: () => void;
   fetchDetalle: (id: number) => Promise<void>;
   clearDetalle: () => void;
   refetch: () => Promise<void>;
@@ -72,6 +73,15 @@ export function useNotificaciones(): UseNotificacionesResult {
     });
   }, []);
 
+  const markAllAsRead = useCallback(() => {
+    setReadIds((prev) => {
+      const next = new Set(prev);
+      notificaciones.forEach((n) => next.add(n.id));
+      saveReadIds(next);
+      return next;
+    });
+  }, [notificaciones]);
+
   const isRead = useCallback((id: number) => readIds.has(id), [readIds]);
 
   const unreadCount = notificaciones.filter((n) => !readIds.has(n.id)).length;
@@ -103,6 +113,7 @@ export function useNotificaciones(): UseNotificacionesResult {
     unreadCount,
     isRead,
     markAsRead,
+    markAllAsRead,
     fetchDetalle,
     clearDetalle,
     refetch: fetchNotificaciones,
