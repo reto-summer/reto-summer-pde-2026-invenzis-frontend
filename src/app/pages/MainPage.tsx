@@ -63,7 +63,15 @@ export default function MainPage() {
           }
         });
 
-      return matchesSearch && matchesType && matchesTime;
+      const matchesFechaPublicacion =
+        (!filters.fechaPublicacionDesde || bid.fecha_publicacion >= filters.fechaPublicacionDesde) &&
+        (!filters.fechaPublicacionHasta || bid.fecha_publicacion <= filters.fechaPublicacionHasta);
+
+      const matchesFechaCierre =
+        (!filters.fechaCierreDesde || bid.fecha_cierre >= filters.fechaCierreDesde) &&
+        (!filters.fechaCierreHasta || bid.fecha_cierre <= filters.fechaCierreHasta);
+
+      return matchesSearch && matchesType && matchesTime && matchesFechaPublicacion && matchesFechaCierre;
     });
   }, [licitaciones, filters]);
 

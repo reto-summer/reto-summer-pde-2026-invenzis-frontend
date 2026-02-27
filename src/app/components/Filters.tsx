@@ -6,8 +6,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import type { FiltersState, DateRangeKey } from "../types/filters";
-import { DATE_RANGE_LABELS, DEFAULT_FILTERS } from "../types/filters";
+import type { FiltersState } from "../types/filters";
+import { DEFAULT_FILTERS } from "../types/filters";
 
 interface FiltersProps {
   value: FiltersState;
@@ -78,6 +78,12 @@ function toDateStr(year: number, month: number, day: number): string {
 
 const MONTHS_ES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DAYS_ES   = ["L","M","X","J","V","S","D"];
+
+function dateOffset(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+}
 
 // ─── MiniCalendar ─────────────────────────────────────────────────────────────
 
@@ -221,9 +227,16 @@ function FilterChip({ label, checked, onToggle }: { label: string; checked: bool
 const inputClass    = "w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-300 transition-all";
 const labelClass    = "text-xs font-medium text-slate-500";
 
-// ─── PlazoPill — single-select dropdown: Hoy / <7 / 7-15 / >15 ──────────────
+// ─── Shared popover actions ───────────────────────────────────────────────────
 
-function PlazoPill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
+const PLAZO_OPTIONS = [
+  { label: "Hoy",  desde: 0,  hasta: 0  },
+  { label: "< 7",  desde: 0,  hasta: 6  },
+  { label: "7-15", desde: 7,  hasta: 15 },
+  { label: "> 15", desde: 16, hasta: -1 },
+] as const;
+
+function PlazoDropdown({ onSelect }: { onSelect: (desde: string, hasta: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -236,78 +249,63 @@ function PlazoPill({ value, onChange }: { value: FiltersState; onChange: (f: Fil
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  function selectRange(key: DateRangeKey) {
-    // single-select: toggle off if already selected, otherwise select only this one
-    const next = value.dateRanges.includes(key) ? [] : [key];
-    onChange({ ...value, dateRanges: next });
-    setOpen(false);
-  }
-
-  const isActive   = value.dateRanges.length > 0;
-  const pillLabel  = value.dateRanges.length === 1 ? DATE_RANGE_LABELS[value.dateRanges[0]] : "Hoy";
-
   return (
     <div className="relative" ref={ref}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm font-medium transition-all
-          focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
-          ${isActive
-            ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
-            : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-          }`}
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-all focus:outline-none"
       >
-        <CalendarIcon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
-        <span>{pillLabel}</span>
+        <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+        Plazo
+        <svg className="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 left-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 py-1 min-w-[140px]">
-          {(Object.keys(DATE_RANGE_LABELS) as DateRangeKey[]).map((key) => {
-            const isSelected = value.dateRanges.includes(key);
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => selectRange(key)}
-                className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-sm transition-all hover:bg-slate-50 focus:outline-none
-                  ${isSelected ? "text-blue-600 font-semibold" : "text-slate-700"}`}
-              >
-                <span>{DATE_RANGE_LABELS[key]}</span>
-                {isSelected && (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                )}
-              </button>
-            );
-          })}
+        <div className="absolute bottom-full mb-1 left-0 z-[60] bg-white rounded-lg shadow-xl border border-slate-200 py-1 min-w-[110px]">
+          {PLAZO_OPTIONS.map((opt) => (
+            <button
+              key={opt.label}
+              type="button"
+              onClick={() => {
+                const desde = buildDatetime(dateOffset(opt.desde), "00:00");
+                const hasta = opt.hasta >= 0 ? buildDatetime(dateOffset(opt.hasta), "23:59") : "";
+                onSelect(desde, hasta);
+                setOpen(false);
+              }}
+              className="w-full px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-all focus:outline-none text-left"
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// ─── Shared popover actions ───────────────────────────────────────────────────
-
-function PopoverActions({ onClear, onApply }: { onClear: () => void; onApply: () => void }) {
+function PopoverActions({ onClear, onApply, onSelectPlazo }: { onClear: () => void; onApply: () => void; onSelectPlazo: (desde: string, hasta: string) => void }) {
   return (
-    <div className="flex justify-end gap-2 pt-1 border-t border-slate-100">
-      <button
-        type="button"
-        onClick={onClear}
-        className="py-1.5 px-3 rounded-md border border-red-500 bg-white text-red-500 text-xs font-semibold hover:bg-red-50 transition-all focus:outline-none"
-      >
-        Limpiar
-      </button>
-      <button
-        type="button"
-        onClick={onApply}
-        className="py-1.5 px-3 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all focus:outline-none"
-      >
-        Aplicar
-      </button>
+    <div className="flex items-center justify-between py-3 border-t border-slate-100">
+      <PlazoDropdown onSelect={onSelectPlazo} />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={onClear}
+          className="py-1.5 px-3 rounded-md border border-red-500 bg-white text-red-500 text-xs font-semibold hover:bg-red-50 transition-all focus:outline-none"
+        >
+          Limpiar
+        </button>
+        <button
+          type="button"
+          onClick={onApply}
+          className="py-1.5 px-3 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all focus:outline-none"
+        >
+          Aplicar
+        </button>
+      </div>
     </div>
   );
 }
@@ -315,9 +313,11 @@ function PopoverActions({ onClear, onApply }: { onClear: () => void; onApply: ()
 // ─── PublicacionPill ──────────────────────────────────────────────────────────
 
 function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
-  const [open, setOpen] = useState(false);
-  const [desde, setDesde] = useState("");
-  const [hasta, setHasta] = useState("");
+  const [open, setOpen]           = useState(false);
+  const [desde, setDesde]         = useState("");
+  const [hasta, setHasta]         = useState("");
+  const [horaDesde, setHoraDesde] = useState("00:00");
+  const [horaHasta, setHoraHasta] = useState("23:59");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -330,18 +330,25 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
   }, [open]);
 
   function handleOpen() {
-    setDesde(value.fechaPublicacionDesde ?? "");
-    setHasta(value.fechaPublicacionHasta ?? "");
+    setDesde(value.fechaPublicacionDesde?.split("T")[0] ?? "");
+    setHasta(value.fechaPublicacionHasta?.split("T")[0] ?? "");
+    setHoraDesde(value.fechaPublicacionDesde?.split("T")[1]?.slice(0, 5) ?? "00:00");
+    setHoraHasta(value.fechaPublicacionHasta?.split("T")[1]?.slice(0, 5) ?? "23:59");
     setOpen(true);
   }
 
   function handleApply() {
-    onChange({ ...value, fechaPublicacionDesde: desde, fechaPublicacionHasta: hasta });
+    onChange({
+      ...value,
+      fechaPublicacionDesde: desde ? buildDatetime(desde, horaDesde) : "",
+      fechaPublicacionHasta: hasta ? buildDatetime(hasta, horaHasta) : "",
+    });
     setOpen(false);
   }
 
   function handleClear() {
     setDesde(""); setHasta("");
+    setHoraDesde("00:00"); setHoraHasta("23:59");
     onChange({ ...value, fechaPublicacionDesde: "", fechaPublicacionHasta: "" });
     setOpen(false);
   }
@@ -375,7 +382,7 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 p-5 flex flex-col gap-4 w-auto">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 px-5 pt-5 pb-0 flex flex-col gap-4 w-auto">
           <div className="flex gap-6">
             <MiniCalendar
               label="Desde"
@@ -397,7 +404,24 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
               initMonth={hastaInitRaw.getMonth()}
             />
           </div>
-          <PopoverActions onClear={handleClear} onApply={handleApply} />
+          <div className="flex gap-4 border-t border-slate-100 pt-3">
+            <div className="flex flex-col gap-1 flex-1">
+              <label className={labelClass}>Hora desde</label>
+              <input type="time" value={horaDesde} onChange={(e) => setHoraDesde(e.target.value)} className={inputClass} />
+            </div>
+            <div className="flex flex-col gap-1 flex-1">
+              <label className={labelClass}>Hora hasta</label>
+              <input type="time" value={horaHasta} onChange={(e) => setHoraHasta(e.target.value)} className={inputClass} />
+            </div>
+          </div>
+          <PopoverActions
+            onClear={handleClear}
+            onApply={handleApply}
+            onSelectPlazo={(desde, hasta) => {
+              onChange({ ...value, fechaPublicacionDesde: desde, fechaPublicacionHasta: hasta });
+              setOpen(false);
+            }}
+          />
         </div>
       )}
     </div>
@@ -476,7 +500,7 @@ function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: Fi
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 p-5 flex flex-col gap-4 w-auto">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-lg shadow-xl border border-slate-200 px-5 pt-5 pb-0 flex flex-col gap-4 w-auto">
           <div className="flex gap-6">
             <MiniCalendar
               label="Desde"
@@ -498,7 +522,7 @@ function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: Fi
               initMonth={hastaInitRaw.getMonth()}
             />
           </div>
-          <div className="flex gap-4 pt-1 border-t border-slate-100">
+          <div className="flex gap-4 border-t border-slate-100 pt-3">
             <div className="flex flex-col gap-1 flex-1">
               <label className={labelClass}>Hora desde</label>
               <input type="time" value={horaDesde} onChange={(e) => setHoraDesde(e.target.value)} className={inputClass} />
@@ -508,7 +532,14 @@ function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: Fi
               <input type="time" value={horaHasta} onChange={(e) => setHoraHasta(e.target.value)} className={inputClass} />
             </div>
           </div>
-          <PopoverActions onClear={handleClear} onApply={handleApply} />
+          <PopoverActions
+            onClear={handleClear}
+            onApply={handleApply}
+            onSelectPlazo={(desde, hasta) => {
+              onChange({ ...value, fechaCierreDesde: desde, fechaCierreHasta: hasta });
+              setOpen(false);
+            }}
+          />
         </div>
       )}
     </div>
@@ -632,14 +663,6 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
       return { ...f, tenderTypes: next };
     });
 
-  const mobileToggleDateRange = (key: DateRangeKey) =>
-    setMobileFilters((f) => {
-      const next = f.dateRanges.includes(key)
-        ? f.dateRanges.filter((d) => d !== key)
-        : [...f.dateRanges, key];
-      return { ...f, dateRanges: next };
-    });
-
   // ── Desktop derived ──
   const hasActiveDateFilter =
     !!value.fechaPublicacionDesde || !!value.fechaPublicacionHasta ||
@@ -729,16 +752,6 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
               </div>
             )}
 
-            {/* Plazo de cierre */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Plazo de cierre</label>
-              <div className="flex flex-col gap-2">
-                {(Object.keys(DATE_RANGE_LABELS) as DateRangeKey[]).map((key) => (
-                  <FilterChip key={key} label={DATE_RANGE_LABELS[key]} checked={mobileFilters.dateRanges.includes(key)} onToggle={() => mobileToggleDateRange(key)} />
-                ))}
-              </div>
-            </div>
-
             {/* Fecha — toggle + date inputs nativos */}
             <div className="flex flex-col gap-3">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Fecha</label>
@@ -825,9 +838,6 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
 
             {/* Tipo de licitación */}
             <TipoPill value={value} onChange={onChange} availableTipos={availableTipos} />
-
-            {/* Plazo de cierre — pill desplegable */}
-            <PlazoPill value={value} onChange={onChange} />
 
             {/* Fecha publicación y cierre — pills independientes */}
             <PublicacionPill value={value} onChange={onChange} />

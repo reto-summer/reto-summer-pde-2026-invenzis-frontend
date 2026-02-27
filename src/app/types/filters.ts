@@ -16,8 +16,8 @@ export interface FiltersState {
   dateRanges: DateRangeKey[];
   familia: number;
   subfamilia: number;
-  fechaPublicacionDesde?: string; // YYYY-MM-DD
-  fechaPublicacionHasta?: string; // YYYY-MM-DD
+  fechaPublicacionDesde?: string; // YYYY-MM-DDTHH:MM:SS
+  fechaPublicacionHasta?: string; // YYYY-MM-DDTHH:MM:SS
   fechaCierreDesde?: string;      // YYYY-MM-DDTHH:MM:SS
   fechaCierreHasta?: string;      // YYYY-MM-DDTHH:MM:SS
 }
