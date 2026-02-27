@@ -42,7 +42,7 @@ export function BidCard({ bid }: BidCardProps) {
 
       className="block bg-white border border-slate-200 rounded-lg p-4 transition-all hover:shadow-md hover:border-blue-300"
     >
-      {/* Fila superior: badge de urgencia + familia */}
+      {/* Fila superior: badge de urgencia + tipo */}
       <div className="flex items-center gap-3 mb-3">
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getUrgencyStyle(hoursToClose)}`}
@@ -50,7 +50,7 @@ export function BidCard({ bid }: BidCardProps) {
           ⏱ {getUrgencyLabel(hoursToClose)}
         </span>
         <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-          {bid.familia.nombre}
+          {bid.tipo_licitacion}
         </span>
       </div>
 
