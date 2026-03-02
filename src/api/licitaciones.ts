@@ -4,7 +4,7 @@ import type { FiltersState } from "../app/types/filters";
 import type { LicitacionBackendResponse } from "./types";
 
 /**
- * Query params según contrato V1.1 para GET /licitaciones.
+ * Query params para GET /licitaciones.
  * familiaCod/subfamiliaCod: int
  * fechaPublicacionDesde/Hasta: YYYY-MM-DD
  * fechaCierreDesde/Hasta: YYYY-MM-DDTHH:MM:SS
@@ -17,16 +17,6 @@ export interface LicitacionesQuery {
     fechaPublicacionHasta?: string;
     fechaCierreDesde?: string;
     fechaCierreHasta?: string;
-}
-
-/**
- * Query params temporales (get/all) — familia y subfamilia sin renombrar.
- * @deprecated Usar LicitacionesQuery con familiaCod/subfamiliaCod según contrato V1.1.
- */
-export interface LicitacionesQueryAll {
-    [key: string]: string | number | undefined;
-    familia?: number;
-    subfamilia?: number;
 }
 
 /**
@@ -61,22 +51,14 @@ function mapBackendToBid(response: LicitacionBackendResponse): Bid {
 }
 
 /**
- * GET /licitaciones — Temporal (get/all). Respuesta como array directo.
- * @deprecated Reemplazar por getLicitaciones() cuando el backend esté alineado con contrato V1.1.
- */
-export async function getLicitacionesTodas(query: LicitacionesQueryAll = {}): Promise<Bid[]> {
-    const response = await api.get<LicitacionBackendResponse[]>("/licitaciones", { params: query });
-    return response.map(mapBackendToBid);
-}
-
-/**
- * GET /licitaciones — Según contrato V1.1.
- * Filtros: familiaCod, subfamiliaCod, fechaPublicacionDesde/Hasta, fechaCierreDesde/Hasta.
- * Respuesta: { licitaciones: Licitacion[] }
+ * GET /licitaciones
+ * Soporta respuesta como array directo o como { licitaciones: [] }.
  */
 export async function getLicitaciones(query: LicitacionesQuery = {}): Promise<Bid[]> {
-    const response = await api.get<{ licitaciones: LicitacionBackendResponse[] }>("/licitaciones", { params: query });
-    return (response?.licitaciones ?? []).map(mapBackendToBid);
+    const response = await api.get<LicitacionBackendResponse[] | { licitaciones: LicitacionBackendResponse[] }>("/licitaciones", { params: query });
+    if (!response) return [];
+    const items = Array.isArray(response) ? response : (response.licitaciones ?? []);
+    return items.map(mapBackendToBid);
 }
 
 /**

@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useLicitaciones } from "../hooks/useLicitaciones";
-import { DEFAULT_FILTERS } from "../types/filters";
 import type { Bid } from "../types/Bid";
 import Header from "../components/header";
 import Sidebar from "../components/Sidebar";
@@ -17,11 +16,14 @@ function normalizeTipo(tipo: string): string {
 }
 
 export default function MainPage() {
-  const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod } = useAppContext();
-  const { licitaciones, loading, error } = useLicitaciones({
-    familia: familiaCod ? Number(familiaCod) : undefined,
-    subfamilia: subfamiliaCod ? Number(subfamiliaCod) : undefined,
-  });
+  const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod, configLoaded } = useAppContext();
+  const { licitaciones, loading, error } = useLicitaciones(
+    {
+      familiaCod: familiaCod ? Number(familiaCod) : undefined,
+      subfamiliaCod: subfamiliaCod ? Number(subfamiliaCod) : undefined,
+    },
+    configLoaded,
+  );
 
   const availableTipos = useMemo(() => {
     const set = new Set<string>();
@@ -75,10 +77,6 @@ export default function MainPage() {
     });
   }, [licitaciones, filters]);
 
-  function handleClearFilters() {
-    setFilters(DEFAULT_FILTERS);
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar — fixed on the left, shown only when open */}
@@ -114,7 +112,6 @@ export default function MainPage() {
               <EmptyState
                 title="No hay licitaciones disponibles"
                 description="No se encontraron licitaciones en este momento."
-                onClear={handleClearFilters}
               />
             ) : (
               filteredBids.map((bid: Bid) => (

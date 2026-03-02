@@ -60,6 +60,12 @@ export const api = {
       method: "POST",
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
+  put: <T>(path: string, body?: unknown, config?: RequestConfig) =>
+    request<T>(path, {
+      ...config,
+      method: "PUT",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    }),
   delete: <T>(path: string, config?: RequestConfig) =>
     request<T>(path, { ...config, method: "DELETE" }),
 };
