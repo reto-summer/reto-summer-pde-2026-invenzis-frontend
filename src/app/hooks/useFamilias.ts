@@ -33,7 +33,7 @@ export function useFamilias(): UseFamiliasResult {
     setError(null);
     try {
       const data = await getFamilias();
-      setFamilias(data);
+      setFamilias([...data].sort((a, b) => a.cod - b.cod));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al cargar familias");
       setFamilias([]);
@@ -63,7 +63,7 @@ export function useFamilias(): UseFamiliasResult {
     setError(null);
     getSubfamiliasPorFamilia(familiaCod)
       .then((data) => {
-        if (!cancelled) setSubfamilias(data);
+        if (!cancelled) setSubfamilias([...data].sort((a, b) => a.cod - b.cod));
       })
       .catch((e) => {
         if (!cancelled) {
