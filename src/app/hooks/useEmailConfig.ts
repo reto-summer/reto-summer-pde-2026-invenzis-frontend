@@ -26,8 +26,8 @@ export function useEmailConfig(): UseEmailConfigResult {
     try {
       const data = await getEmailConfig();
       setEmails(data);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al cargar configuracion de emails");
+    } catch {
+      setError("No se pudieron cargar los emails. Intenta de nuevo.");
       setEmails([]);
     } finally {
       setLoading(false);
@@ -43,9 +43,8 @@ export function useEmailConfig(): UseEmailConfigResult {
     try {
       await postEmailConfig({ direccion });
       await fetchEmails();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al agregar email");
-      throw e;
+    } catch {
+      setError("No se pudo agregar el email. Verificá que sea válido e intentá de nuevo.");
     }
   }, [fetchEmails]);
 
@@ -54,9 +53,8 @@ export function useEmailConfig(): UseEmailConfigResult {
     try {
       await deleteEmailConfig(direccion);
       await fetchEmails();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al eliminar email");
-      throw e;
+    } catch {
+      setError("No se pudo eliminar el email. Intentá de nuevo.");
     }
   }, [fetchEmails]);
 

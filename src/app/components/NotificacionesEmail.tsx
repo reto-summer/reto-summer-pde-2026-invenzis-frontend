@@ -81,7 +81,9 @@ export default function NotificacionesEmail() {
           {loadingEmails && (
             <p className="text-sm text-slate-500">Cargando emails...</p>
           )}
-          {emailError && <p className="text-sm text-red-500">{emailError}</p>}
+          {emailError && (
+            <p className="text-xs text-red-500 leading-snug">{emailError}</p>
+          )}
 
           {/* Lista de emails guardados */}
           {emails.length > 0 && (
