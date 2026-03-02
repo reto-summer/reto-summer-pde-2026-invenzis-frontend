@@ -52,7 +52,8 @@ export function useNotificaciones(): UseNotificacionesResult {
       const data = await getNotificaciones();
       setNotificaciones(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al cargar notificaciones");
+      console.error("fetchNotificaciones:", e);
+      setError("No se pudieron cargar las notificaciones. Intenta de nuevo.");
       setNotificaciones([]);
     } finally {
       setLoading(false);
@@ -94,7 +95,8 @@ export function useNotificaciones(): UseNotificacionesResult {
       const data = await getNotificacion(id);
       setDetalleActual(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al cargar notificacion");
+      console.error("fetchDetalle:", e);
+      setError("No se pudo cargar el detalle de la notificación. Intenta de nuevo.");
     } finally {
       setLoadingDetalle(false);
     }

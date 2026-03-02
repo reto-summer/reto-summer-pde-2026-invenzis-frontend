@@ -30,7 +30,8 @@ export function useLicitaciones(initialQuery: LicitacionesQueryAll = {}): UseLic
             const data = await getLicitacionesTodas(query);
             setLicitaciones(data);
         } catch (e) {
-            setError(e instanceof Error ? e.message : "Error al cargar licitaciones");
+            console.error("fetchLicitaciones:", e);
+            setError("No se pudieron cargar las licitaciones. Intenta de nuevo.");
             setLicitaciones([]);
         } finally {
             setLoading(false);
