@@ -35,7 +35,8 @@ export function useFamilias(): UseFamiliasResult {
       const data = await getFamilias();
       setFamilias([...data].sort((a, b) => a.cod - b.cod));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al cargar familias");
+      console.error("fetchFamilias:", e);
+      setError("No se pudieron cargar las familias. Intenta de nuevo.");
       setFamilias([]);
     } finally {
       setLoadingFamilias(false);
@@ -67,7 +68,8 @@ export function useFamilias(): UseFamiliasResult {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Error al cargar subfamilias");
+          console.error("fetchSubfamilias:", e);
+          setError("No se pudieron cargar las subfamilias. Intenta de nuevo.");
           setSubfamilias([]);
         }
       })
