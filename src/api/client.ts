@@ -44,7 +44,11 @@ async function request<T>(
   }
   const text = await response.text();
   if (!text.trim()) return undefined as T;
-  return JSON.parse(text) as T;
+  const contentType = response.headers.get("Content-Type") ?? "";
+  if (contentType.includes("application/json")) {
+    return JSON.parse(text) as T;
+  }
+  return text as T;
 }
 
 export const api = {
