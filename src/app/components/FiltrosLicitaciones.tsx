@@ -29,18 +29,25 @@ export default function FiltrosLicitaciones({
     error: famError,
   } = useFamilias();
 
-  // Refs inicializados desde el contexto (última selección confirmada)
-  const initialFamiliaCod = useRef(ctxFamiliaCod);
-  const initialSubfamiliaCod = useRef(ctxSubfamiliaCod);
+  // Última selección confirmada (base para detectar cambios pendientes)
+  const initialFamiliaCod = useRef<string | null>(null);
+  const initialSubfamiliaCod = useRef<string | null>(null);
 
-  // Al montar, restaurar la selección guardada en el contexto
-  const pendingSubfamilia = useRef<string | null>(ctxSubfamiliaCod);
+  // Subfamilia pendiente de restaurar una vez que carguen las subfamilias
+  const pendingSubfamilia = useRef<string | null>(null);
+  // Evita re-sincronizar si el usuario ya interactuó con los selects
+  const hasSynced = useRef(false);
+
+  // Restaurar la selección guardada cuando el config llega del servidor
   useEffect(() => {
-    if (ctxFamiliaCod) {
+    if (!hasSynced.current && ctxFamiliaCod) {
+      hasSynced.current = true;
+      initialFamiliaCod.current = ctxFamiliaCod;
+      initialSubfamiliaCod.current = ctxSubfamiliaCod;
+      pendingSubfamilia.current = ctxSubfamiliaCod;
       setFamiliaCod(ctxFamiliaCod);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ctxFamiliaCod, ctxSubfamiliaCod, setFamiliaCod]);
 
   // Una vez que cargaron las subfamilias, restaurar la subfamilia pendiente
   useEffect(() => {
