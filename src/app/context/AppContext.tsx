@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from "rea
 import type { ReactNode } from "react";
 import type { FiltersState } from "../types/filters";
 import { DEFAULT_FILTERS } from "../types/filters";
-import { getConfig, postConfig } from "../../api/config";
+import { getConfig, putConfig } from "../../api/config";
 
 interface AppState {
   filters: FiltersState;
@@ -10,6 +10,8 @@ interface AppState {
   /** Filtros cascada (familia/subfamilia) para GET /licitaciones */
   familiaCod: string | null;
   subfamiliaCod: string | null;
+  /** true una vez que GET /config resolvió — evita fetch prematuro de licitaciones */
+  configLoaded: boolean;
 }
 
 interface AppContextType extends AppState {
@@ -25,19 +27,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [familiaCod, setFamiliaCodState] = useState<string | null>(null);
   const [subfamiliaCod, setSubfamiliaCod] = useState<string | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   // Cargar selección guardada al iniciar
   useEffect(() => {
     getConfig().then((config) => {
       if (config.familiaCod) setFamiliaCodState(String(config.familiaCod));
       if (config.subfamiliaCod) setSubfamiliaCod(String(config.subfamiliaCod));
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => {
+      setConfigLoaded(true);
+    });
   }, []);
 
   const setFiltrosCascada = useCallback((fam: string | null, sub: string | null) => {
     setFamiliaCodState(fam);
     setSubfamiliaCod(sub);
-    postConfig({
+    putConfig({
       familiaCod: fam ? Number(fam) : null,
       subfamiliaCod: sub ? Number(sub) : null,
     }).catch(() => {});
@@ -50,6 +55,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         sidebarOpen,
         familiaCod,
         subfamiliaCod,
+        configLoaded,
         setFilters,
         setSidebarOpen,
         setFiltrosCascada,

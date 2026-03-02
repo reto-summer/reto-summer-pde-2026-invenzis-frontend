@@ -5,7 +5,6 @@
 
 const getBaseUrl = (): string => {
   const url = __API_BASE_URL__;
-  console.log("API_BASE_URL cargada:", url); // <- Temporal para debug
   if (!url) {
     throw new Error("API_BASE_URL environment variable is required");
   }
@@ -58,6 +57,12 @@ export const api = {
     request<T>(path, {
       ...config,
       method: "POST",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    }),
+  put: <T>(path: string, body?: unknown, config?: RequestConfig) =>
+    request<T>(path, {
+      ...config,
+      method: "PUT",
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
   delete: <T>(path: string, config?: RequestConfig) =>

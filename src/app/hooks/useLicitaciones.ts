@@ -4,30 +4,28 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-// TODO: cuando el backend esté alineado con contrato V1.1, reemplazar getLicitacionesTodas por getLicitaciones
-// y cambiar LicitacionesQueryAll por LicitacionesQuery (familiaCod/subfamiliaCod + filtros de fecha).
-import { getLicitacionesTodas, type LicitacionesQueryAll } from "../../api/licitaciones";
+import { getLicitaciones, type LicitacionesQuery } from "../../api/licitaciones";
 import type { Bid } from "../types/Bid";
 
 export interface UseLicitacionesResult {
     licitaciones: Bid[];
     loading: boolean;
     error: string | null;
-    refetchLicitaciones: (query?: LicitacionesQueryAll) => Promise<void>;
+    refetchLicitaciones: (query?: LicitacionesQuery) => Promise<void>;
 }
 
-export function useLicitaciones(initialQuery: LicitacionesQueryAll = {}): UseLicitacionesResult {
+export function useLicitaciones(initialQuery: LicitacionesQuery = {}, enabled = true): UseLicitacionesResult {
     const [licitaciones, setLicitaciones] = useState<Bid[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const { familia, subfamilia } = initialQuery;
+    const { familiaCod, subfamiliaCod } = initialQuery;
 
-    const fetchLicitaciones = useCallback(async (query: LicitacionesQueryAll = {}) => {
+    const fetchLicitaciones = useCallback(async (query: LicitacionesQuery = {}) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await getLicitacionesTodas(query);
+            const data = await getLicitaciones(query);
             setLicitaciones(data);
         } catch (e) {
             console.error("fetchLicitaciones:", e);
@@ -39,11 +37,12 @@ export function useLicitaciones(initialQuery: LicitacionesQueryAll = {}): UseLic
     }, []);
 
     useEffect(() => {
-        const query: LicitacionesQueryAll = {};
-        if (familia && familia > 0) query.familia = familia;
-        if (subfamilia && subfamilia > 0) query.subfamilia = subfamilia;
+        if (!enabled) return;
+        const query: LicitacionesQuery = {};
+        if (familiaCod && familiaCod > 0) query.familiaCod = familiaCod;
+        if (subfamiliaCod && subfamiliaCod > 0) query.subfamiliaCod = subfamiliaCod;
         fetchLicitaciones(query);
-    }, [fetchLicitaciones, familia, subfamilia]);
+    }, [enabled, fetchLicitaciones, familiaCod, subfamiliaCod]);
 
     return {
         licitaciones,

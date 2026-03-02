@@ -32,8 +32,8 @@ export default function NotificacionesEmail() {
             Notificaciones por Email
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Agrega direcciones de correo electrónico para recibir notificaciones
-            cuando aparezcan nuevas licitaciones
+            Agregue direcciones de correo electrónico para recibir notificaciones
+            diarias de novedades.
           </p>
         </div>
         <svg

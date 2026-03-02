@@ -29,28 +29,34 @@ export default function FiltrosLicitaciones({
     error: famError,
   } = useFamilias();
 
-  // Refs inicializados desde el contexto (última selección confirmada)
-  const initialFamiliaCod = useRef(ctxFamiliaCod);
-  const initialSubfamiliaCod = useRef(ctxSubfamiliaCod);
+  // Última selección confirmada (base para detectar cambios pendientes)
+  const initialFamiliaCod = useRef<string | null>(null);
+  const initialSubfamiliaCod = useRef<string | null>(null);
 
-  // Al montar, restaurar la selección guardada en el contexto
-  const pendingSubfamilia = useRef<string | null>(ctxSubfamiliaCod);
+  // Subfamilia pendiente de restaurar una vez que carguen las subfamilias
+  const pendingSubfamilia = useRef<string | null>(null);
+  // Evita re-sincronizar si el usuario ya interactuó con los selects
+  const hasSynced = useRef(false);
+
+  // Restaurar la selección guardada cuando el config llega del servidor
   useEffect(() => {
-    if (ctxFamiliaCod) {
+    if (!hasSynced.current && ctxFamiliaCod) {
+      hasSynced.current = true;
+      initialFamiliaCod.current = ctxFamiliaCod;
+      initialSubfamiliaCod.current = ctxSubfamiliaCod;
+      pendingSubfamilia.current = ctxSubfamiliaCod;
       setFamiliaCod(ctxFamiliaCod);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ctxFamiliaCod, ctxSubfamiliaCod, setFamiliaCod]);
 
-  // Una vez que cargaron las subfamilias, restaurar la subfamilia pendiente
+  // Una vez que cargaron las subfamilias: restaurar la pendiente o auto-seleccionar la primera
   useEffect(() => {
-    if (
-      !loadingSubfamilias &&
-      pendingSubfamilia.current &&
-      subfamilias.length > 0
-    ) {
+    if (loadingSubfamilias || subfamilias.length === 0) return;
+    if (pendingSubfamilia.current) {
       setSubfamiliaCod(pendingSubfamilia.current);
       pendingSubfamilia.current = null;
+    } else {
+      setSubfamiliaCod(String(subfamilias[0].cod));
     }
   }, [loadingSubfamilias, subfamilias, setSubfamiliaCod]);
 
@@ -78,8 +84,8 @@ export default function FiltrosLicitaciones({
             Filtros de Licitaciones
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Selecciona una familia y subfamilia para filtrar las licitaciones
-            que deseas monitorear
+            Seleccione una familia y subfamilia para filtrar las licitaciones
+            que deseas monitorear por novedades.
           </p>
         </div>
         <svg
@@ -119,12 +125,10 @@ export default function FiltrosLicitaciones({
                   disabled={loadingFamilias}
                   className="w-full appearance-none pl-4 pr-10 py-3 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="">
-                    {loadingFamilias ? "Cargando..." : "Seleccionar familia..."}
-                  </option>
+                  {loadingFamilias && <option value="">Cargando...</option>}
                   {familias.map((f) => (
                     <option key={f.cod} value={String(f.cod)}>
-                      {f.descripcion}
+                      {f.cod} - {f.descripcion}
                     </option>
                   ))}
                 </select>
@@ -163,14 +167,10 @@ export default function FiltrosLicitaciones({
                   disabled={!familiaCod || loadingSubfamilias}
                   className="w-full appearance-none pl-4 pr-10 py-3 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:text-slate-400"
                 >
-                  <option value="">
-                    {loadingSubfamilias
-                      ? "Cargando..."
-                      : "Seleccionar subfamilia..."}
-                  </option>
+                  {loadingSubfamilias && <option value="">Cargando...</option>}
                   {subfamilias.map((sf) => (
                     <option key={sf.cod} value={String(sf.cod)}>
-                      {sf.descripcion}
+                      {sf.cod} - {sf.descripcion}
                     </option>
                   ))}
                 </select>
