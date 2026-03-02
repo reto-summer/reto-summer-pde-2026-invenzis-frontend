@@ -4,9 +4,6 @@
  * el estado completo (FiltersState) y las etiquetas en español para la UI.
  */
 
-/** Claves válidas para filtrar por tipo de licitación */
-export type TenderTypeKey = "licitacion_publica" | "compra_directa" | "licitacion_abreviada";
-
 /** Claves válidas para filtrar por días restantes hasta el cierre */
 export type DateRangeKey = "today" | "under_7" | "7_15" | "over_15";
 
@@ -14,22 +11,16 @@ export type DateRangeKey = "today" | "under_7" | "7_15" | "over_15";
 
 export interface FiltersState {
   search: string;
-  tenderTypes: TenderTypeKey[];
+  /** Tipos de licitación seleccionados. Vacío = sin filtro (muestra todos). */
+  tenderTypes: string[];
   dateRanges: DateRangeKey[];
   familia: number;
   subfamilia: number;
-  fechaPublicacionDesde?: string; // YYYY-MM-DD
-  fechaPublicacionHasta?: string; // YYYY-MM-DD
+  fechaPublicacionDesde?: string; // YYYY-MM-DDTHH:MM:SS
+  fechaPublicacionHasta?: string; // YYYY-MM-DDTHH:MM:SS
   fechaCierreDesde?: string;      // YYYY-MM-DDTHH:MM:SS
   fechaCierreHasta?: string;      // YYYY-MM-DDTHH:MM:SS
 }
-
-/** Etiquetas en español para cada tipo de licitación */
-export const TENDER_TYPE_LABELS: Record<TenderTypeKey, string> = {
-  licitacion_publica: "Licitación Pública",
-  compra_directa: "Compra Directa",
-  licitacion_abreviada: "Licitación Abreviada",
-};
 
 /** Etiquetas en español para cada rango de días */
 export const DATE_RANGE_LABELS: Record<DateRangeKey, string> = {
@@ -39,10 +30,10 @@ export const DATE_RANGE_LABELS: Record<DateRangeKey, string> = {
   over_15: ">15 días",
 };
 
-/** Valores iniciales: búsqueda vacía, los 3 tipos marcados, sin filtro por plazo */
+/** Valores iniciales: búsqueda vacía, sin tipos seleccionados (muestra todos), sin filtro por plazo */
 export const DEFAULT_FILTERS: FiltersState = {
   search: "",
-  tenderTypes: ["licitacion_publica", "compra_directa", "licitacion_abreviada"],
+  tenderTypes: [],
   dateRanges: [],
   familia: 0,
   subfamilia: 0,
