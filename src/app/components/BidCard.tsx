@@ -21,11 +21,11 @@ function getUrgencyLabel(hours: number): string {
   return `${days}d restantes`;
 }
 
-//para probar lo que llega del back
 function formatDate(dateString: string): string {
   if (!dateString) return "N/A";
   try {
-    const date = new Date(dateString);
+    const normalized = dateString.includes("T") ? dateString : `${dateString}T00:00:00`;
+    const date = new Date(normalized);
     if (isNaN(date.getTime())) return "N/A";
     return date.toLocaleDateString("es-AR");
   } catch {
