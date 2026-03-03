@@ -89,7 +89,7 @@ export default function MainPage() {
     const expired = filteredBids.filter(isExpired);
     if (showExpired) {
       return {
-        visibleBids: filteredBids,
+        visibleBids: expired,
         expiredCount: expired.length,
       };
     }
@@ -120,22 +120,18 @@ export default function MainPage() {
         <div className="pt-20">
           {/* Filter bar — sticks below the header while scrolling */}
           <div className="sticky top-20 z-30">
-            <Filters value={filters} onChange={setFilters} availableTipos={availableTipos} />
+            <Filters
+              value={filters}
+              onChange={setFilters}
+              availableTipos={availableTipos}
+              expiredCount={expiredCount}
+              showExpired={showExpired}
+              onToggleExpired={() => setShowExpired((prev) => !prev)}
+            />
           </div>
 
           {/* Bid cards list */}
           <div className="p-4 flex flex-col gap-3">
-            {!loading && !error && expiredCount > 0 && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowExpired((prev) => !prev)}
-                  className="text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md px-3 py-1 hover:bg-blue-100 transition-colors"
-                >
-                  {showExpired ? "Ocultar" : "Mostrar"} licitaciones vencidas ({expiredCount})
-                </button>
-              </div>
-            )}
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <BidCardSkeleton key={i} />
