@@ -5,7 +5,11 @@ export function formatShort(iso: string): string {
   return `${parts[2]}/${parts[1]}`;
 }
 
-export function buildDatetime(date: string, time: string, seconds = "00"): string {
+export function buildDatetime(
+  date: string,
+  time: string,
+  seconds = "00",
+): string {
   if (!date) return "";
   return `${date}T${time}:${seconds}`;
 }
@@ -20,5 +24,31 @@ export function dateOffset(days: number): string {
   return toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-export const MONTHS_ES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+export const MONTHS_ES = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
 export const DAYS_ES = ["L", "M", "X", "J", "V", "S", "D"];
+
+export function formatNotificationDate(dateStr: string): string {
+  if (!dateStr) return "N/A";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "N/A";
+  return d.toLocaleDateString("es-UY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
