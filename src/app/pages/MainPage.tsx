@@ -66,9 +66,14 @@ export default function MainPage() {
           }
         });
 
+      // Normalize fecha_publicacion: backend may return "YYYY-MM-DD" without time,
+      // which compares as less-than "YYYY-MM-DDT..." strings, excluding the start day.
+      const pubDateNorm = bid.fecha_publicacion?.includes("T")
+        ? bid.fecha_publicacion
+        : `${bid.fecha_publicacion}T00:00:00`;
       const matchesFechaPublicacion =
-        (!filters.fechaPublicacionDesde || bid.fecha_publicacion >= filters.fechaPublicacionDesde) &&
-        (!filters.fechaPublicacionHasta || bid.fecha_publicacion <= filters.fechaPublicacionHasta);
+        (!filters.fechaPublicacionDesde || pubDateNorm >= filters.fechaPublicacionDesde) &&
+        (!filters.fechaPublicacionHasta || pubDateNorm <= filters.fechaPublicacionHasta);
 
       const matchesFechaCierre =
         (!filters.fechaCierreDesde || bid.fecha_cierre >= filters.fechaCierreDesde) &&
