@@ -3,10 +3,10 @@ options:
 
 substitutions:
   _REGION: us-east1
-  _SERVICE: qa-reto-summer-pde-2026-frontend
+  _SERVICE: prod-reto-summer-pde-2026-frontend
   _AR_REPO: reto-summer-pde-2026
-  _IMAGE: qa-reto-summer-pde-2026-frontend
-  _API_BASE_URL: https://qa-reto-summer-pde-2026-invenzis-backend-133459896240.us-east1.run.app
+  _IMAGE: prod-reto-summer-pde-2026-frontend
+  _API_BASE_URL: https://prod-reto-summer-pde-2026-invenzis-backend-133459896240.us-east1.run.app
 
 steps:
   # Build
