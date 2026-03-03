@@ -728,9 +728,9 @@ export function Filters({
               type="button"
               onClick={onToggleExpired}
               disabled={expiredCount === 0 && !showExpired}
-              className={`ml-auto text-xs font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
-                  ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
-                  : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
+              className={`ml-auto text-sm font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
+                ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
+                : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
                 }`}
             >
               {showExpired ? "Ver vigentes" : "Ver solo vencidas"} ({expiredCount})
@@ -890,9 +890,9 @@ export function Filters({
                 type="button"
                 onClick={onToggleExpired}
                 disabled={expiredCount === 0 && !showExpired}
-                className={`ml-auto text-xs font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
-                    ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
-                    : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
+                className={`ml-auto text-sm font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
+                  ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
+                  : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
                   }`}
               >
                 {showExpired ? "Ver vigentes" : "Ver solo vencidas"} ({expiredCount})
