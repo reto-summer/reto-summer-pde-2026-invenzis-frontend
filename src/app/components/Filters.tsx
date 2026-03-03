@@ -70,9 +70,9 @@ function formatShort(iso: string): string {
   return `${parts[2]}/${parts[1]}`;
 }
 
-function buildDatetime(date: string, time: string): string {
+function buildDatetime(date: string, time: string, seconds = "00"): string {
   if (!date) return "";
-  return `${date}T${time}:00`;
+  return `${date}T${time}:${seconds}`;
 }
 
 function toDateStr(year: number, month: number, day: number): string {
@@ -274,7 +274,7 @@ function PlazoDropdown({ onSelect }: { onSelect: (desde: string, hasta: string) 
               type="button"
               onClick={() => {
                 const desde = buildDatetime(dateOffset(opt.desde), "00:00");
-                const hasta = opt.hasta >= 0 ? buildDatetime(dateOffset(opt.hasta), "23:59") : "";
+                const hasta = opt.hasta >= 0 ? buildDatetime(dateOffset(opt.hasta), "23:59", "59") : "";
                 onSelect(desde, hasta);
                 setOpen(false);
               }}
@@ -344,7 +344,7 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
     onChange({
       ...value,
       fechaPublicacionDesde: desde ? buildDatetime(desde, horaDesde) : "",
-      fechaPublicacionHasta: hasta ? buildDatetime(hasta, horaHasta) : "",
+      fechaPublicacionHasta: hasta ? buildDatetime(hasta, horaHasta, "59") : "",
     });
     setOpen(false);
   }
@@ -462,7 +462,7 @@ function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: Fi
     onChange({
       ...value,
       fechaCierreDesde: desde ? buildDatetime(desde, horaDesde) : "",
-      fechaCierreHasta: hasta ? buildDatetime(hasta, horaHasta) : "",
+      fechaCierreHasta: hasta ? buildDatetime(hasta, horaHasta, "59") : "",
     });
     setOpen(false);
   }
@@ -791,11 +791,11 @@ export function Filters({
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1">
                     <label className={labelClass}>Desde</label>
-                    <input type="date" value={mobileFilters.fechaPublicacionDesde ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaPublicacionDesde: e.target.value }))} className={mobileInputClass} />
+                    <input type="date" value={mobileFilters.fechaPublicacionDesde?.split("T")[0] ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaPublicacionDesde: buildDatetime(e.target.value, "00:00") }))} className={mobileInputClass} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className={labelClass}>Hasta</label>
-                    <input type="date" value={mobileFilters.fechaPublicacionHasta ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaPublicacionHasta: e.target.value }))} className={mobileInputClass} />
+                    <input type="date" value={mobileFilters.fechaPublicacionHasta?.split("T")[0] ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaPublicacionHasta: buildDatetime(e.target.value, "23:59", "59") }))} className={mobileInputClass} />
                   </div>
                 </div>
               )}
@@ -808,7 +808,7 @@ export function Filters({
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className={labelClass}>Hasta</label>
-                    <input type="date" value={mobileFilters.fechaCierreHasta?.split("T")[0] ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaCierreHasta: buildDatetime(e.target.value, f.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59") }))} className={mobileInputClass} />
+                    <input type="date" value={mobileFilters.fechaCierreHasta?.split("T")[0] ?? ""} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaCierreHasta: buildDatetime(e.target.value, f.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59", "59") }))} className={mobileInputClass} />
                   </div>
                   <div className="flex gap-3">
                     <div className="flex flex-col gap-1 flex-1">
@@ -817,7 +817,7 @@ export function Filters({
                     </div>
                     <div className="flex flex-col gap-1 flex-1">
                       <label className={labelClass}>Hora hasta</label>
-                      <input type="time" value={mobileFilters.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59"} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaCierreHasta: buildDatetime(f.fechaCierreHasta?.split("T")[0] ?? "", e.target.value) }))} className={mobileInputClass} />
+                      <input type="time" value={mobileFilters.fechaCierreHasta?.split("T")[1]?.slice(0, 5) ?? "23:59"} onChange={(e) => setMobileFilters((f) => ({ ...f, fechaCierreHasta: buildDatetime(f.fechaCierreHasta?.split("T")[0] ?? "", e.target.value, "59") }))} className={mobileInputClass} />
                     </div>
                   </div>
                 </div>
