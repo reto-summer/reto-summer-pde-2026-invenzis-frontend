@@ -3,7 +3,11 @@ name: Deploy to DEV
 on:
   push:
     branches:
+<<<<<<< HEAD
       - dev
+=======
+      - main
+>>>>>>> main
   workflow_dispatch:
 
 permissions:
@@ -44,9 +48,13 @@ jobs:
 
       - name: Build Docker image
         run: |
+<<<<<<< HEAD
           docker build \
             --build-arg API_BASE_URL=${{ secrets.API_BASE_URL }} \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+=======
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+>>>>>>> main
 
       - name: Push Docker image
         run: |

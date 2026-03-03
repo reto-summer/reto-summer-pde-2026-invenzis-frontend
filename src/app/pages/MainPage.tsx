@@ -12,11 +12,23 @@ import { EmptyState } from "../components/ui/EmptyState";
 
 /** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
 function normalizeTipo(tipo: string): string {
-  return tipo.replace(/\d+/g, "").replace(/\//g, "").replace(/\s+/g, " ").trim();
+  return tipo
+    .replace(/\d+/g, "")
+    .replace(/\//g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export default function MainPage() {
-  const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod, configLoaded } = useAppContext();
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    filters,
+    setFilters,
+    familiaCod,
+    subfamiliaCod,
+    configLoaded,
+  } = useAppContext();
   const { licitaciones, loading, error } = useLicitaciones(
     {
       familiaCod: familiaCod ? Number(familiaCod) : undefined,
@@ -66,14 +78,24 @@ export default function MainPage() {
         });
 
       const matchesFechaPublicacion =
-        (!filters.fechaPublicacionDesde || bid.fecha_publicacion >= filters.fechaPublicacionDesde) &&
-        (!filters.fechaPublicacionHasta || bid.fecha_publicacion <= filters.fechaPublicacionHasta);
+        (!filters.fechaPublicacionDesde ||
+          bid.fecha_publicacion >= filters.fechaPublicacionDesde) &&
+        (!filters.fechaPublicacionHasta ||
+          bid.fecha_publicacion <= filters.fechaPublicacionHasta);
 
       const matchesFechaCierre =
-        (!filters.fechaCierreDesde || bid.fecha_cierre >= filters.fechaCierreDesde) &&
-        (!filters.fechaCierreHasta || bid.fecha_cierre <= filters.fechaCierreHasta);
+        (!filters.fechaCierreDesde ||
+          bid.fecha_cierre >= filters.fechaCierreDesde) &&
+        (!filters.fechaCierreHasta ||
+          bid.fecha_cierre <= filters.fechaCierreHasta);
 
-      return matchesSearch && matchesType && matchesTime && matchesFechaPublicacion && matchesFechaCierre;
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesTime &&
+        matchesFechaPublicacion &&
+        matchesFechaCierre
+      );
     });
   }, [licitaciones, filters]);
 
@@ -84,7 +106,7 @@ export default function MainPage() {
 
       {/* Main content — shifts right when sidebar is open */}
       <div
-        className={`transition-[margin] duration-300 ${sidebarOpen ? "sm:ml-[400px]" : "ml-0"}`}
+        className={`transition-[margin] duration-300 ${sidebarOpen ? "`sm:ml-100" : "ml-0"}`}
       >
         {/* Fixed header */}
         <Header
@@ -97,7 +119,11 @@ export default function MainPage() {
         <div className="pt-20">
           {/* Filter bar — sticks below the header while scrolling */}
           <div className="sticky top-20 z-30">
-            <Filters value={filters} onChange={setFilters} availableTipos={availableTipos} />
+            <Filters
+              value={filters}
+              onChange={setFilters}
+              availableTipos={availableTipos}
+            />
           </div>
 
           {/* Bid cards list */}

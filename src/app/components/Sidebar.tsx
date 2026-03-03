@@ -18,7 +18,7 @@ export default function Sidebar({ onClose }: SidebarProps = {}) {
       )}
 
       {/* Sidebar */}
-      <aside className="inset-x-0 sm:right-auto sm:w-[400px] h-screen bg-white px-6 py-6 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-200 text-slate-900">
+      <aside className="inset-x-0 sm:right-auto sm:w-100 h-screen bg-white px-6 py-6 flex flex-col fixed left-0 top-0 z-40 shadow-2xl border-r border-slate-200 text-slate-900">
         {/* Header - Título principal */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
