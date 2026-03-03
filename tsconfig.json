@@ -1,18 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
     "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-<<<<<<< HEAD
     "types": ["vite/client"],
-=======
-    "types": ["vite/client", "react", "react-dom"],
->>>>>>> dev
     "skipLibCheck": true,
     "jsx": "react-jsx",
 
