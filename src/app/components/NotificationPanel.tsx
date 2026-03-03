@@ -100,14 +100,19 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
         <div className="flex items-center gap-2">
           <span className="text-base font-bold text-slate-900">Notificaciones</span>
           {unreadCount > 0 && (
-            <button
-              type="button"
-              onClick={markAllAsRead}
-              className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors"
-              aria-label="Marcar todas como vistas"
-            >
-              {unreadCount} nueva{unreadCount !== 1 ? "s" : ""}
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                {unreadCount} nueva{unreadCount !== 1 ? "s" : ""}
+              </span>
+              <button
+                type="button"
+                onClick={markAllAsRead}
+                className="text-xs font-semibold text-blue-700 hover:text-blue-800 transition-colors"
+                aria-label="Marcar todas como vistas"
+              >
+                Marcar todas como vistas
+              </button>
+            </div>
           )}
         </div>
         <button
