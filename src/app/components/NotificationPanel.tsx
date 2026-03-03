@@ -1,5 +1,9 @@
+import { useState, useEffect, useRef, useCallback, useMemo, type UIEvent } from "react";
 import type { UseNotificacionesResult } from "../hooks/useNotificaciones";
 import type { NotificacionResumen } from "../../api/types";
+
+const INITIAL_COUNT = 20;
+const LOAD_MORE_COUNT = 10;
 
 interface NotificationPanelProps {
   hook: UseNotificacionesResult;
@@ -91,6 +95,39 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
     clearDetalle,
   } = hook;
 
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  const hasInitialized = useRef(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Al cargar por primera vez, mostrar al menos las notificaciones nuevas
+  useEffect(() => {
+    if (!loading && notificaciones.length > 0 && !hasInitialized.current) {
+      hasInitialized.current = true;
+      setVisibleCount(Math.max(INITIAL_COUNT, unreadCount));
+    }
+  }, [loading, notificaciones.length, unreadCount]);
+
+  const handleScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    if (nearBottom) {
+      setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, notificaciones.length));
+    }
+  }, [notificaciones.length]); // notificaciones.length == sortedNotificaciones.length
+
+  // Unread primero (fecha desc), luego leídas (fecha desc)
+  const sortedNotificaciones = useMemo(() => {
+    return [...notificaciones].sort((a, b) => {
+      const aRead = isRead(a.id);
+      const bRead = isRead(b.id);
+      if (aRead !== bRead) return aRead ? 1 : -1;
+      return new Date(b.executionDate).getTime() - new Date(a.executionDate).getTime();
+    });
+  }, [notificaciones, isRead]);
+
+  const visibleNotificaciones = sortedNotificaciones.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedNotificaciones.length;
+
   return (
     <div className="absolute right-0 top-full mt-2 w-[400px] bg-white rounded-lg shadow-xl border border-slate-200 z-50 flex flex-col"
       style={{ maxHeight: 'min(520px, 80vh)' }}
@@ -172,7 +209,7 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
         </div>
       ) : (
         /* Vista lista */
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div ref={listRef} className="flex-1 overflow-y-auto overscroll-contain" onScroll={handleScroll}>
           {loading && (
             <div className="px-4 py-8 text-center text-sm text-slate-400">
               Cargando notificaciones...
@@ -191,7 +228,7 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
               No hay notificaciones de la ultima semana
             </div>
           )}
-          {!loading && notificaciones.map((n) => (
+          {!loading && visibleNotificaciones.map((n) => (
             <NotificationItem
               key={n.id}
               notif={n}
@@ -199,6 +236,16 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
               onClick={() => fetchDetalle(n.id)}
             />
           ))}
+          {!loading && hasMore && (
+            <div className="px-4 py-3 text-center text-xs text-slate-400">
+              Scroll para ver más notificaciones
+            </div>
+          )}
+          {!loading && !hasMore && notificaciones.length > INITIAL_COUNT && (
+            <div className="px-4 py-3 text-center text-xs text-slate-300">
+              No hay más notificaciones
+            </div>
+          )}
         </div>
       )}
     </div>
