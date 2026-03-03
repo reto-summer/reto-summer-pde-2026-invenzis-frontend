@@ -1,12 +1,17 @@
+import { useState, useEffect } from "react";
 import type { Bid } from "../types/Bid";
 
 interface BidCardProps {
   bid: Bid;
 }
 
-function getHoursToClose(fechaCierre: string): number {
-  const diff = new Date(fechaCierre).getTime() - Date.now();
-  return Math.max(0, Math.floor(diff / (1000 * 60 * 60)));
+function getTimeToClose(fechaCierre: string): { hours: number; minutes: number; totalMinutes: number } {
+  const normalized = fechaCierre.includes("T") ? fechaCierre : `${fechaCierre}T00:00:00`;
+  const diff = new Date(normalized).getTime() - Date.now();
+  const totalMinutes = Math.max(0, Math.floor(diff / (1000 * 60)));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return { hours, minutes, totalMinutes };
 }
 
 function getUrgencyStyle(hours: number): string {
@@ -15,7 +20,8 @@ function getUrgencyStyle(hours: number): string {
   return "bg-emerald-500 text-white";
 }
 
-function getUrgencyLabel(hours: number): string {
+function getUrgencyLabel(hours: number, minutes: number): string {
+  if (hours === 0) return `${minutes}m restantes`;
   if (hours < 24) return `${hours}h restantes`;
   const days = Math.floor(hours / 24);
   return `${days}d restantes`;
@@ -34,7 +40,19 @@ function formatDate(dateString: string): string {
 }
 
 export function BidCard({ bid }: BidCardProps) {
-  const hoursToClose = getHoursToClose(bid.fecha_cierre);
+  const [time, setTime] = useState(() => getTimeToClose(bid.fecha_cierre));
+
+  useEffect(() => {
+    if (time.totalMinutes === 0) return;
+
+    const interval = setInterval(() => {
+      setTime(getTimeToClose(bid.fecha_cierre));
+    }, 60_000);
+
+    return () => clearInterval(interval);
+  }, [time.totalMinutes === 0, bid.fecha_cierre]);
+
+  const { hours, minutes } = time;
 
   return (
     <a
@@ -45,9 +63,9 @@ export function BidCard({ bid }: BidCardProps) {
       {/* Fila superior: badge de urgencia + familia */}
       <div className="flex items-center gap-3 mb-3">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getUrgencyStyle(hoursToClose)}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getUrgencyStyle(hours)}`}
         >
-          ⏱ {getUrgencyLabel(hoursToClose)}
+          ⏱ {getUrgencyLabel(hours, minutes)}
         </span>
         <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
           {bid.familia.nombre}
