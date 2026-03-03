@@ -96,23 +96,25 @@ export function NotificationPanel({ hook, onClose }: NotificationPanelProps) {
       style={{ maxHeight: 'min(520px, 80vh)' }}
     >
       {/* Panel header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-base font-bold text-slate-900">Notificaciones</span>
-          {unreadCount > 0 && (
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+      <div className="flex items-start justify-between px-4 py-3 border-b border-slate-200 shrink-0">
+        <div className="flex flex-col items-start gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold text-slate-900">Notificaciones</span>
+            {unreadCount > 0 && (
+              <span className="text-xs font-semibold text-blue-700">
                 {unreadCount} nueva{unreadCount !== 1 ? "s" : ""}
               </span>
-              <button
-                type="button"
-                onClick={markAllAsRead}
-                className="text-xs font-semibold text-blue-700 hover:text-blue-800 transition-colors"
-                aria-label="Marcar todas como vistas"
-              >
-                Marcar todas como vistas
-              </button>
-            </div>
+            )}
+          </div>
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={markAllAsRead}
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors"
+              aria-label="Marcar todas como vistas"
+            >
+              Marcar todas como vistas
+            </button>
           )}
         </div>
         <button
