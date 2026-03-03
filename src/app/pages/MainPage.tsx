@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useAppContext } from "../hooks/useAppContext";
 import { useLicitaciones } from "../hooks/useLicitaciones";
 import type { Bid } from "../types/Bid";
@@ -24,6 +24,7 @@ export default function MainPage() {
     },
     configLoaded,
   );
+  const [showExpired, setShowExpired] = useState(false);
 
   const availableTipos = useMemo(() => {
     const set = new Set<string>();
@@ -77,6 +78,28 @@ export default function MainPage() {
     });
   }, [licitaciones, filters]);
 
+  const { visibleBids, expiredCount } = useMemo(() => {
+    const now = Date.now();
+    const isExpired = (bid: Bid) => {
+      const closeTs = new Date(bid.fecha_cierre).getTime();
+      if (Number.isNaN(closeTs)) return false;
+      return closeTs < now;
+    };
+
+    const expired = filteredBids.filter(isExpired);
+    if (showExpired) {
+      return {
+        visibleBids: expired,
+        expiredCount: expired.length,
+      };
+    }
+
+    return {
+      visibleBids: filteredBids.filter((bid) => !isExpired(bid)),
+      expiredCount: expired.length,
+    };
+  }, [filteredBids, showExpired]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar — fixed on the left, shown only when open */}
@@ -88,7 +111,7 @@ export default function MainPage() {
       >
         {/* Fixed header */}
         <Header
-          subtitle={`${filteredBids.length} licitaciones disponibles`}
+          subtitle={`${visibleBids.length} licitaciones disponibles`}
           sidebarOpen={sidebarOpen}
           onSettingsClick={() => setSidebarOpen(true)}
         />
@@ -97,7 +120,14 @@ export default function MainPage() {
         <div className="pt-20">
           {/* Filter bar — sticks below the header while scrolling */}
           <div className="sticky top-20 z-30">
-            <Filters value={filters} onChange={setFilters} availableTipos={availableTipos} />
+            <Filters
+              value={filters}
+              onChange={setFilters}
+              availableTipos={availableTipos}
+              expiredCount={expiredCount}
+              showExpired={showExpired}
+              onToggleExpired={() => setShowExpired((prev) => !prev)}
+            />
           </div>
 
           {/* Bid cards list */}
@@ -108,13 +138,13 @@ export default function MainPage() {
               ))
             ) : error ? (
               <ErrorMessage message={error} />
-            ) : filteredBids.length === 0 ? (
+            ) : visibleBids.length === 0 ? (
               <EmptyState
                 title="No hay licitaciones disponibles"
                 description="No se encontraron licitaciones en este momento."
               />
             ) : (
-              filteredBids.map((bid: Bid) => (
+              visibleBids.map((bid: Bid) => (
                 <BidCard key={bid.id_licitacion} bid={bid} />
               ))
             )}

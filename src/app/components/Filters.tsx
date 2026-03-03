@@ -14,6 +14,9 @@ interface FiltersProps {
   onChange: (filters: FiltersState) => void;
   /** Tipos de licitación disponibles, derivados dinámicamente del backend */
   availableTipos?: string[];
+  expiredCount?: number;
+  showExpired?: boolean;
+  onToggleExpired?: () => void;
 }
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -76,8 +79,8 @@ function toDateStr(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-const MONTHS_ES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const DAYS_ES   = ["L","M","X","J","V","S","D"];
+const MONTHS_ES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const DAYS_ES = ["L", "M", "X", "J", "V", "S", "D"];
 
 function dateOffset(days: number): string {
   const d = new Date();
@@ -110,9 +113,9 @@ function MiniCalendar({
   const today = new Date();
   const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const daysInMonth   = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const firstDayRaw   = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
-  const firstDayMon   = (firstDayRaw + 6) % 7; // 0=Mon
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDayRaw = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
+  const firstDayMon = (firstDayRaw + 6) % 7; // 0=Mon
 
   const cells: (number | null)[] = [
     ...Array(firstDayMon).fill(null),
@@ -160,17 +163,17 @@ function MiniCalendar({
         {cells.map((day, i) => {
           if (!day) return <div key={i} className="h-8" />;
           const dateStr = toDateStr(viewYear, viewMonth, day);
-          const isSelected   = selected === dateStr;
-          const isToday      = dateStr === todayStr;
-          const inRange      = rangeStart && rangeEnd && dateStr > rangeStart && dateStr < rangeEnd;
+          const isSelected = selected === dateStr;
+          const isToday = dateStr === todayStr;
+          const inRange = rangeStart && rangeEnd && dateStr > rangeStart && dateStr < rangeEnd;
           const isRangeStart = rangeStart && dateStr === rangeStart && rangeEnd;
-          const isRangeEnd   = rangeEnd   && dateStr === rangeEnd   && rangeStart;
+          const isRangeEnd = rangeEnd && dateStr === rangeEnd && rangeStart;
 
           return (
             <div key={i} className={`h-8 flex items-center justify-center
-              ${inRange      ? "bg-blue-50" : ""}
+              ${inRange ? "bg-blue-50" : ""}
               ${isRangeStart ? "bg-blue-50 rounded-l-full" : ""}
-              ${isRangeEnd   ? "bg-blue-50 rounded-r-full" : ""}
+              ${isRangeEnd ? "bg-blue-50 rounded-r-full" : ""}
             `}>
               <button
                 type="button"
@@ -179,8 +182,8 @@ function MiniCalendar({
                   ${isSelected
                     ? "bg-blue-600 text-white font-semibold"
                     : isToday
-                    ? "border border-blue-400 text-blue-600 font-medium hover:bg-blue-50"
-                    : "text-slate-700 hover:bg-slate-100"
+                      ? "border border-blue-400 text-blue-600 font-medium hover:bg-blue-50"
+                      : "text-slate-700 hover:bg-slate-100"
                   }`}
               >
                 {day}
@@ -224,15 +227,15 @@ function FilterChip({ label, checked, onToggle }: { label: string; checked: bool
   );
 }
 
-const inputClass    = "w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-300 transition-all";
-const labelClass    = "text-xs font-medium text-slate-500";
+const inputClass = "w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-300 transition-all";
+const labelClass = "text-xs font-medium text-slate-500";
 
 // ─── Shared popover actions ───────────────────────────────────────────────────
 
 const PLAZO_OPTIONS = [
-  { label: "Hoy",  desde: 0,  hasta: 0  },
-  { label: "< 7",  desde: 0,  hasta: 6  },
-  { label: "7-15", desde: 7,  hasta: 15 },
+  { label: "Hoy", desde: 0, hasta: 0 },
+  { label: "< 7", desde: 0, hasta: 6 },
+  { label: "7-15", desde: 7, hasta: 15 },
   { label: "> 15", desde: 16, hasta: -1 },
 ] as const;
 
@@ -313,9 +316,9 @@ function PopoverActions({ onClear, onApply, onSelectPlazo }: { onClear: () => vo
 // ─── PublicacionPill ──────────────────────────────────────────────────────────
 
 function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
-  const [open, setOpen]           = useState(false);
-  const [desde, setDesde]         = useState("");
-  const [hasta, setHasta]         = useState("");
+  const [open, setOpen] = useState(false);
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
   const [horaDesde, setHoraDesde] = useState("00:00");
   const [horaHasta, setHoraHasta] = useState("23:59");
   const ref = useRef<HTMLDivElement>(null);
@@ -362,7 +365,7 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
   }
 
   const today = new Date();
-  const desdeInit    = desde ? new Date(desde + "T12:00:00") : today;
+  const desdeInit = desde ? new Date(desde + "T12:00:00") : today;
   const hastaInitRaw = hasta ? new Date(hasta + "T12:00:00") : new Date(desdeInit.getFullYear(), desdeInit.getMonth() + 1, 1);
 
   return (
@@ -431,9 +434,9 @@ function PublicacionPill({ value, onChange }: { value: FiltersState; onChange: (
 // ─── CierrePill ───────────────────────────────────────────────────────────────
 
 function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: FiltersState) => void }) {
-  const [open, setOpen]         = useState(false);
-  const [desde, setDesde]       = useState("");
-  const [hasta, setHasta]       = useState("");
+  const [open, setOpen] = useState(false);
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
   const [horaDesde, setHoraDesde] = useState("00:00");
   const [horaHasta, setHoraHasta] = useState("23:59");
   const ref = useRef<HTMLDivElement>(null);
@@ -480,7 +483,7 @@ function CierrePill({ value, onChange }: { value: FiltersState; onChange: (f: Fi
   }
 
   const today = new Date();
-  const desdeInit    = desde ? new Date(desde + "T12:00:00") : today;
+  const desdeInit = desde ? new Date(desde + "T12:00:00") : today;
   const hastaInitRaw = hasta ? new Date(hasta + "T12:00:00") : new Date(desdeInit.getFullYear(), desdeInit.getMonth() + 1, 1);
 
   return (
@@ -589,8 +592,8 @@ function TipoPill({
     value.tenderTypes.length === 1
       ? value.tenderTypes[0]
       : value.tenderTypes.length > 1
-      ? `Tipo (${value.tenderTypes.length})`
-      : "Tipo";
+        ? `Tipo (${value.tenderTypes.length})`
+        : "Tipo";
 
   return (
     <div className="relative" ref={ref}>
@@ -632,13 +635,20 @@ function TipoPill({
 
 // ─── Main Filters component ───────────────────────────────────────────────────
 
-export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) {
-  const [mobileOpen, setMobileOpen]           = useState(false);
+export function Filters({
+  value,
+  onChange,
+  availableTipos = [],
+  expiredCount = 0,
+  showExpired = false,
+  onToggleExpired,
+}: FiltersProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileFechaMode, setMobileFechaMode] = useState<"publicacion" | "cierre">("publicacion");
 
   // Local state for mobile panel — only applied when user presses "Aplicar"
   const [mobileFilters, setMobileFilters] = useState<FiltersState>(value);
-  const mobileOriginal                    = useRef<FiltersState>(value);
+  const mobileOriginal = useRef<FiltersState>(value);
 
   function openMobilePanel() {
     mobileOriginal.current = value;
@@ -666,7 +676,7 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
   // ── Desktop derived ──
   const hasActiveDateFilter =
     !!value.fechaPublicacionDesde || !!value.fechaPublicacionHasta ||
-    !!value.fechaCierreDesde      || !!value.fechaCierreHasta;
+    !!value.fechaCierreDesde || !!value.fechaCierreHasta;
 
   const hasActiveFilters =
     value.search !== "" ||
@@ -690,7 +700,7 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
     <>
       {/* ── MOBILE: botón "Filtrar" ── */}
       <section className="md:hidden w-full border-y border-slate-200 bg-white" aria-label="Filtros de licitaciones">
-        <div className="px-4 py-3 flex items-center gap-3">
+        <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           <button
             type="button"
             onClick={openMobilePanel}
@@ -711,6 +721,19 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
               className="px-4 py-2 rounded-md border border-red-500 bg-white text-red-500 text-sm font-semibold hover:bg-red-50 transition-all focus:outline-none"
             >
               Limpiar
+            </button>
+          )}
+          {onToggleExpired && (
+            <button
+              type="button"
+              onClick={onToggleExpired}
+              disabled={expiredCount === 0 && !showExpired}
+              className={`ml-auto text-sm font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
+                ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
+                : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
+                }`}
+            >
+              {showExpired ? "Ver vigentes" : "Ver solo vencidas"} ({expiredCount})
             </button>
           )}
         </div>
@@ -861,6 +884,20 @@ export function Filters({ value, onChange, availableTipos = [] }: FiltersProps) 
               </svg>
               Limpiar filtros
             </button>
+
+            {onToggleExpired && (
+              <button
+                type="button"
+                onClick={onToggleExpired}
+                disabled={expiredCount === 0 && !showExpired}
+                className={`ml-auto text-sm font-medium rounded-md px-3 py-1.5 border transition-colors ${expiredCount > 0
+                  ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100"
+                  : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed"
+                  }`}
+              >
+                {showExpired ? "Ver vigentes" : "Ver solo vencidas"} ({expiredCount})
+              </button>
+            )}
           </div>
         </div>
       </section>
