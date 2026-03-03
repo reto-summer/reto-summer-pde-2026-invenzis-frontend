@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react";
-import { useAppContext } from "../shared/context/AppContext";
-import { useLicitaciones } from "../shared/hooks/useLicitaciones";
 import type { Bid } from "../features/bids/types/Bid";
 import { default as Header } from "../components/layout/Header";
 import { default as Sidebar } from "../components/layout/Sidebar";
-import { BidCard } from "../features/bids";
-import { Filters } from "../features/filters";
 import { BidCardSkeleton, ErrorMessage, EmptyState } from "../components/ui";
+import { useAppContext, useLicitaciones, BidCard, Filters } from "../";
 
 /** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
 function normalizeTipo(tipo: string): string {
