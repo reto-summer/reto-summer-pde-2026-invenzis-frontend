@@ -1,10 +1,25 @@
+/**
+ * Componente BidCard — Tarjeta de resumen de una licitación.
+ *
+ * Muestra el título, descripción, tipo de urgencia y fechas de una licitación.
+ * La urgencia se calcula en tiempo real a partir de las horas restantes hasta
+ * el cierre: ≤48h (rojo), ≤96h (naranja), >96h (verde).
+ * El contador se actualiza automáticamente cada 60 segundos via `setInterval`.
+ */
+
 import { useState, useEffect } from "react";
 import type { Bid } from "../types/Bid";
 
+/** Props del componente BidCard. */
 interface BidCardProps {
+  /** Licitación a renderizar. */
   bid: Bid;
 }
 
+/**
+ * Calcula las horas, minutos y minutos totales hasta el cierre de la licitación.
+ * Normaliza fechas sin componente de hora para evitar desfases de zona horaria.
+ */
 function getTimeToClose(fechaCierre: string): { hours: number; minutes: number; totalMinutes: number } {
   const normalized = fechaCierre.includes("T") ? fechaCierre : `${fechaCierre}T00:00:00`;
   const diff = new Date(normalized).getTime() - Date.now();
@@ -14,12 +29,17 @@ function getTimeToClose(fechaCierre: string): { hours: number; minutes: number; 
   return { hours, minutes, totalMinutes };
 }
 
+/**
+ * Clases Tailwind para el badge de urgencia según horas restantes.
+ * Umbrales: ≤48h → rojo, ≤96h → naranja, >96h → verde.
+ */
 function getUrgencyStyle(hours: number): string {
   if (hours <= 48) return "bg-red-500 text-white";
   if (hours <= 96) return "bg-orange-500 text-white";
   return "bg-emerald-500 text-white";
 }
 
+/** Etiqueta legible del tiempo restante: minutos si < 1h, horas si < 24h, días si >= 24h. */
 function getUrgencyLabel(hours: number, minutes: number): string {
   if (hours === 0) return `${minutes}m restantes`;
   if (hours < 24) return `${hours}h restantes`;
@@ -27,6 +47,14 @@ function getUrgencyLabel(hours: number, minutes: number): string {
   return `${days}d restantes`;
 }
 
+/**
+ * Formatea un string de fecha ISO para mostrar en la UI (locale `es-AR`).
+ * Si la fecha viene sin componente de hora ("YYYY-MM-DD"), agrega `T00:00:00`
+ * para forzar interpretación en hora local y evitar desfases de zona horaria.
+ *
+ * @param dateString - Fecha en formato ISO 8601 (con o sin hora).
+ * @returns Fecha formateada o `"N/A"` si la entrada es inválida.
+ */
 function formatDate(dateString: string): string {
   if (!dateString) return "N/A";
   try {
@@ -39,6 +67,11 @@ function formatDate(dateString: string): string {
   }
 }
 
+/**
+ * Tarjeta que muestra el resumen de una licitación.
+ * Actúa como enlace externo (`<a href>`) al sitio de la licitación.
+ * El contador de tiempo restante se actualiza cada 60s automáticamente.
+ */
 export function BidCard({ bid }: BidCardProps) {
   const [time, setTime] = useState(() => getTimeToClose(bid.fecha_cierre));
 

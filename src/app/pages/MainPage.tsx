@@ -1,3 +1,18 @@
+/**
+ * Página principal del Radar de Licitaciones.
+ *
+ * Orquesta la carga de licitaciones, la aplicación de filtros en el cliente
+ * y la separación entre licitaciones vigentes y vencidas. También gestiona
+ * la visibilidad del sidebar de configuración.
+ *
+ * Pipeline de filtrado (client-side sobre el array completo de licitaciones):
+ *   1. Búsqueda libre en título y descripción.
+ *   2. Filtro por tipo de licitación.
+ *   3. Rango de fecha de publicación (inclusive en ambos extremos).
+ *   4. Rango de fecha de cierre (inclusive en ambos extremos).
+ *   5. Separación vigentes / vencidas según `fecha_cierre` vs. `Date.now()`.
+ */
+
 import { useMemo, useState } from "react";
 import type { Bid } from "../features/bids/types/Bid";
 import { default as Header } from "../components/layout/Header";
@@ -5,7 +20,11 @@ import { default as Sidebar } from "../components/layout/Sidebar";
 import { BidCardSkeleton, ErrorMessage, EmptyState } from "../components/ui";
 import { useAppContext, useLicitaciones, BidCard, Filters } from "../";
 
-/** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
+/**
+ * Normaliza el tipo de licitación eliminando dígitos y caracteres especiales
+ * para agrupar variantes bajo un mismo nombre.
+ * Ej: `"Licitación Pública 001"` → `"Licitación Pública"`
+ */
 function normalizeTipo(tipo: string): string {
   return tipo
     .replace(/\d+/g, "")
@@ -54,30 +73,12 @@ export default function MainPage() {
         filters.tenderTypes.length === 0 ||
         filters.tenderTypes.includes(normalizeTipo(bid.tipoLicitacion ?? ""));
 
-      const hours =
-        (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
-      const matchesTime =
-        filters.dateRanges.length === 0 ||
-        filters.dateRanges.some((range) => {
-          switch (range) {
-            case "today":
-              return hours >= 0 && hours < 24;
-            case "under_7":
-              return hours >= 0 && hours <= 168;
-            case "7_15":
-              return hours > 168 && hours <= 360;
-            case "over_15":
-              return hours > 360;
-            default:
-              return false;
-          }
-        });
-
       // Normalize fecha_publicacion: backend may return "YYYY-MM-DD" without time,
       // which compares as less-than "YYYY-MM-DDT..." strings, excluding the start day.
       const pubDateNorm = bid.fecha_publicacion?.includes("T")
         ? bid.fecha_publicacion
         : `${bid.fecha_publicacion}T00:00:00`;
+
       const matchesFechaPublicacion =
         (!filters.fechaPublicacionDesde ||
           pubDateNorm >= filters.fechaPublicacionDesde) &&
@@ -90,13 +91,7 @@ export default function MainPage() {
         (!filters.fechaCierreHasta ||
           bid.fecha_cierre <= filters.fechaCierreHasta);
 
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesTime &&
-        matchesFechaPublicacion &&
-        matchesFechaCierre
-      );
+      return matchesSearch && matchesType && matchesFechaPublicacion && matchesFechaCierre;
     });
   }, [licitaciones, filters]);
 

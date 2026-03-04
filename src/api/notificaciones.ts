@@ -1,6 +1,10 @@
 /**
- * Servicio Notificaciones. GET /notificacion — GET /notificacion/{id}
- * Incluye query param fecha_ejecucion (ISO string) para filtrar por rango de fechas.
+ * Servicio de notificaciones del sistema.
+ * Endpoints: GET /notificacion — GET /notificacion/{id}
+ *
+ * Las respuestas del backend usan nombres en español (titulo, exito, fechaEjecucion)
+ * y se mapean al modelo normalizado en inglés (title, success, executionDate) antes
+ * de ser expuestas a la UI.
  */
 
 import { api } from "./client";
@@ -13,10 +17,18 @@ import type {
 
 const NOTIFICACIONES_PATH = "/notificacion";
 
+/** Devuelve el ISO string de hace 7 días, usado como valor por defecto de `fechaEjecucion`. */
 function getLastWeekISO(): string {
   return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 }
 
+/**
+ * Obtiene el listado de notificaciones del sistema (resumen sin detalle completo).
+ * Por defecto filtra las de la última semana mediante el query param `fechaEjecucion`.
+ *
+ * @param fechaEjecucion - ISO string de fecha límite inferior. Omitir usa la última semana.
+ * @returns Array de `NotificacionResumen` ordenados por el backend.
+ */
 export async function getNotificaciones(fechaEjecucion?: string): Promise<NotificacionResumen[]> {
   const fecha = fechaEjecucion ?? getLastWeekISO();
   const data = await api.get<NotificacionBackendResumen[]>(NOTIFICACIONES_PATH, {
@@ -31,9 +43,15 @@ export async function getNotificaciones(fechaEjecucion?: string): Promise<Notifi
   }));
 }
 
+/**
+ * Obtiene el detalle completo de una notificación por su ID.
+ *
+ * @param id - Identificador numérico de la notificación.
+ * @returns `NotificacionDetalle` con todos los campos, incluyendo `detail` y `content`.
+ */
 export async function getNotificacion(id: number): Promise<NotificacionDetalle> {
   const data = await api.get<NotificacionBackendDetalle>(`${NOTIFICACIONES_PATH}/${id}`);
-  const result = {
+  return {
     id: data.id,
     title: data.titulo ?? "",
     success: data.exito ?? false,
@@ -41,5 +59,4 @@ export async function getNotificacion(id: number): Promise<NotificacionDetalle> 
     detail: data.detalle ?? null,
     content: data.contenido ?? null,
   };
-  return result;
 }

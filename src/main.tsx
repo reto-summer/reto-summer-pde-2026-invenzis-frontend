@@ -1,3 +1,4 @@
+/** Punto de entrada de la aplicación. Monta el árbol React en el elemento `#app` del DOM. */
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app/App";

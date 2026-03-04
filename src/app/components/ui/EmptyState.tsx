@@ -1,6 +1,15 @@
+/**
+ * Componente EmptyState — Pantalla de estado vacío cuando no hay resultados.
+ * Se usa cuando los filtros activos no coinciden con ninguna licitación.
+ */
+
+/** Props del componente EmptyState. */
 interface EmptyStateProps {
+  /** Título del estado vacío. Por defecto: `"Sin resultados"`. */
   title?: string;
+  /** Descripción de por qué no hay resultados. */
   description?: string;
+  /** Si se provee, muestra el botón "Limpiar filtros" que invoca este callback. */
   onClear?: () => void;
 }
 

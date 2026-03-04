@@ -1,5 +1,9 @@
 /**
- * Hook useNotificaciones — lista, detalle, y leido/no-leido via localStorage.
+ * Hook useNotificaciones — Lista, detalle y estado leído/no-leído de notificaciones.
+ *
+ * El estado de lectura se persiste en `localStorage` bajo la clave
+ * `"notificaciones_leidas"` (array de IDs numéricos), de modo que sobrevive
+ * recargas de página sin necesidad de un endpoint de backend.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -14,6 +18,7 @@ import type {
 
 const LS_KEY = "notificaciones_leidas";
 
+/** Lee el set de IDs leídos desde `localStorage`. Devuelve un `Set` vacío ante cualquier error. */
 function loadReadIds(): Set<number> {
   try {
     const raw = localStorage.getItem(LS_KEY);
@@ -24,25 +29,47 @@ function loadReadIds(): Set<number> {
   }
 }
 
+/** Persiste el set de IDs leídos en `localStorage`. */
 function saveReadIds(ids: Set<number>): void {
   localStorage.setItem(LS_KEY, JSON.stringify([...ids]));
 }
 
+/** Resultado expuesto por `useNotificaciones`. */
 export interface UseNotificacionesResult {
+  /** Lista de resúmenes de notificaciones cargadas. */
   notificaciones: NotificacionResumen[];
+  /** Detalle de la notificación actualmente seleccionada, o `null` si ninguna. */
   detalleActual: NotificacionDetalle | null;
+  /** `true` mientras se carga la lista principal. */
   loading: boolean;
+  /** `true` mientras se carga el detalle de una notificación. */
   loadingDetalle: boolean;
+  /** Mensaje de error user-friendly, o `null` si no hay error. */
   error: string | null;
+  /** Cantidad de notificaciones no leídas. */
   unreadCount: number;
+  /** Devuelve `true` si la notificación con el `id` dado fue leída. */
   isRead: (id: number) => boolean;
+  /** Marca una notificación como leída y persiste el cambio. */
   markAsRead: (id: number) => void;
+  /** Marca todas las notificaciones cargadas como leídas. */
   markAllAsRead: () => void;
+  /**
+   * Carga el detalle de una notificación y la marca como leída automáticamente.
+   * @param id - ID de la notificación a abrir.
+   */
   fetchDetalle: (id: number) => Promise<void>;
+  /** Cierra la vista de detalle limpiando `detalleActual`. */
   clearDetalle: () => void;
+  /** Recarga manualmente la lista de notificaciones. */
   refetch: () => Promise<void>;
 }
 
+/**
+ * Hook para gestionar el panel de notificaciones: lista, detalle y lectura.
+ *
+ * @returns `UseNotificacionesResult` con todo el estado y las acciones disponibles.
+ */
 export function useNotificaciones(): UseNotificacionesResult {
   const [notificaciones, setNotificaciones] = useState<NotificacionResumen[]>(
     [],
