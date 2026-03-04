@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getLicitaciones,
   type LicitacionesQuery,
-} from "../../../api/licitaciones";
+} from "../../../api";
 import type { Bid } from "../../features/bids/types/Bid";
 
 export interface UseLicitacionesResult {

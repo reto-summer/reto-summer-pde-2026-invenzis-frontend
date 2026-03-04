@@ -1,5 +1,8 @@
 /**
- * Hook useEmailConfig — GET /config/email, POST /config/email, DELETE /config/email
+ * Hook useEmailConfig — GET /email, POST /email, DELETE /email/{direccion}
+ *
+ * Encapsula la lista de emails registrados para notificaciones y las operaciones
+ * de alta y baja. Carga la lista al montar y la refresca tras cada mutación.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -7,18 +10,39 @@ import {
   getEmailConfig,
   postEmailConfig,
   deleteEmailConfig,
-} from "../../../api/emailConfig";
-import type { EmailConfig } from "../../../api/types";
+  type EmailConfig,
+} from "../../../api";
 
+/** Resultado expuesto por `useEmailConfig`. */
 export interface UseEmailConfigResult {
+  /** Lista actual de emails registrados. */
   emails: EmailConfig[];
+  /** `true` mientras se realiza una petición al backend. */
   loading: boolean;
+  /** Mensaje de error user-friendly, o `null` si no hay error. */
   error: string | null;
+  /**
+   * Registra una nueva dirección de email.
+   * Refresca la lista automáticamente tras el éxito.
+   * @param direccion - Email a agregar.
+   */
   addEmail: (direccion: string) => Promise<void>;
+  /**
+   * Elimina una dirección de email.
+   * Refresca la lista automáticamente tras el éxito.
+   * @param direccion - Email a eliminar.
+   */
   removeEmail: (direccion: string) => Promise<void>;
+  /** Recarga manualmente la lista de emails desde el backend. */
   refetch: () => Promise<void>;
 }
 
+/**
+ * Hook para gestionar los emails de notificación del usuario.
+ * Carga la lista al montar el componente y expone operaciones de alta y baja.
+ *
+ * @returns `UseEmailConfigResult` con estado, carga y funciones de mutación.
+ */
 export function useEmailConfig(): UseEmailConfigResult {
   const [emails, setEmails] = useState<EmailConfig[]>([]);
   const [loading, setLoading] = useState(true);

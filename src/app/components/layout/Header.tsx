@@ -1,11 +1,25 @@
+/**
+ * Componente Header — Barra de navegación fija en la parte superior.
+ *
+ * Muestra el logo, el título de la sección, el subtítulo informativo y el botón
+ * de notificaciones con punto rojo cuando hay notificaciones no leídas.
+ * Al hacer clic en el ícono de campana, abre el `NotificationPanel` flotante y
+ * lo cierra automáticamente al hacer clic fuera de él.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { NotificationPanel } from "../..";
 import { useNotificaciones } from "../../features/notifications/hooks";
 
+/** Props del componente Header. */
 interface HeaderProps {
+  /** Título principal. Por defecto: `"Radar de Licitaciones"`. */
   title?: string;
+  /** Subtítulo informativo (ej: conteo de resultados). */
   subtitle?: string;
+  /** Callback invocado al hacer clic en el ícono de menú hamburguesa. */
   onSettingsClick?: () => void;
+  /** Si `true`, oculta el ícono de menú (el sidebar ya está visible). */
   sidebarOpen?: boolean;
 }
 

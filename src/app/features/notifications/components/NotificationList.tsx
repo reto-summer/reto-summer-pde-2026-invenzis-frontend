@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import type { UIEvent } from "react";
-import type { NotificacionResumen } from "../../../../api/types";
+import type { NotificacionResumen } from "../../../../api";
 import { NotificationItem } from "./NotificationItem";
 
 interface NotificationListProps {

@@ -1,8 +1,24 @@
+/**
+ * Componente FiltrosLicitaciones — Sección de filtros de familia/subfamilia en el Sidebar.
+ *
+ * Gestiona la sincronización entre la selección local (selectores) y la selección
+ * guardada en el servidor (vía `AppContext.setFiltrosCascada`):
+ *
+ * - Al montar, restaura la selección guardada del servidor seteando `familiaCod`
+ *   en el hook local, lo que dispara la carga de subfamilias.
+ * - Una vez que las subfamilias cargan, restaura la subfamilia pendiente o
+ *   selecciona la primera disponible automáticamente.
+ * - El botón "Confirmar" sólo se habilita cuando la selección local difiere
+ *   de la última confirmada, evitando peticiones innecesarias.
+ */
+
 import { useRef, useEffect, useState } from "react";
 import { useFamilias } from "../../shared/hooks/useFamilias";
 import { useAppContext } from "../../shared/context/AppContext";
 
+/** Props del componente FiltrosLicitaciones. */
 interface FiltrosLicitacionesProps {
+  /** Callback opcional invocado tras confirmar la configuración para cerrar el sidebar. */
   onClose?: () => void;
 }
 

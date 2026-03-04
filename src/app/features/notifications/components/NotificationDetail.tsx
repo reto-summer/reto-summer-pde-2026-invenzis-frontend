@@ -1,4 +1,4 @@
-import type { NotificacionDetalle } from "../../../../api/types";
+import type { NotificacionDetalle } from "../../../../api";
 import { StatusBadge } from "./StatusBadge";
 import { formatNotificationDate } from "../../../shared/utils/dateHelpers";
 

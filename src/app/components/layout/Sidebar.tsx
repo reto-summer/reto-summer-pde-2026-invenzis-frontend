@@ -1,7 +1,20 @@
+/**
+ * Componente Sidebar — Panel lateral de configuración.
+ *
+ * Contiene dos secciones colapsables:
+ * 1. `FiltrosLicitaciones`: selección de familia y subfamilia activa.
+ * 2. `NotificacionesEmail`: gestión de emails para notificaciones diarias.
+ *
+ * En móvil muestra un overlay semitransparente que cierra el panel al tocarlo.
+ * En desktop se fija a la izquierda desplazando el contenido principal.
+ */
+
 import FiltrosLicitaciones from "./FiltrosLicitaciones";
 import NotificacionesEmail from "./NotificacionesEmail";
 
+/** Props del componente Sidebar. */
 interface SidebarProps {
+  /** Callback invocado al cerrar el panel (botón "atrás" o tap en el overlay móvil). */
   onClose?: () => void;
 }
 

@@ -1,3 +1,11 @@
+/**
+ * Componente NotificacionesEmail — Sección de emails de notificación en el Sidebar.
+ *
+ * Permite al usuario agregar y eliminar direcciones de email que recibirán
+ * notificaciones diarias sobre nuevas licitaciones. Incluye una sección
+ * colapsable, validación básica de entrada y mensajes de error inline.
+ */
+
 import { useState } from "react";
 import { useEmailConfig } from "../../shared/hooks/useEmailConfig";
 

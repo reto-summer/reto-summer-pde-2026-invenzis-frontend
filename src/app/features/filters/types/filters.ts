@@ -1,40 +1,32 @@
 /**
  * Tipos y constantes para el estado de filtros del Radar de Licitaciones.
- * Define las claves de tipo de licitación, rangos de días hasta el cierre,
- * el estado completo (FiltersState) y las etiquetas en español para la UI.
+ * Define el estado completo (FiltersState) y sus valores por defecto.
  */
 
-/** Claves válidas para filtrar por días restantes hasta el cierre */
-export type DateRangeKey = "today" | "under_7" | "7_15" | "over_15";
-
-/** Estado completo de los filtros (controlado por el padre vía value/onChange) */
-
+/** Estado completo de los filtros de búsqueda. Controlado por el padre vía value/onChange. */
 export interface FiltersState {
+  /** Texto libre para buscar en título y descripción. Vacío = sin filtro. */
   search: string;
   /** Tipos de licitación seleccionados. Vacío = sin filtro (muestra todos). */
   tenderTypes: string[];
-  dateRanges: DateRangeKey[];
+  /** Código de familia seleccionado. 0 = sin filtro. */
   familia: number;
+  /** Código de subfamilia seleccionado. 0 = sin filtro. */
   subfamilia: number;
-  fechaPublicacionDesde?: string; // YYYY-MM-DDTHH:MM:SS
-  fechaPublicacionHasta?: string; // YYYY-MM-DDTHH:MM:SS
-  fechaCierreDesde?: string;      // YYYY-MM-DDTHH:MM:SS
-  fechaCierreHasta?: string;      // YYYY-MM-DDTHH:MM:SS
+  /** Límite inferior del rango de fecha de publicación (YYYY-MM-DDTHH:MM:SS). */
+  fechaPublicacionDesde?: string;
+  /** Límite superior del rango de fecha de publicación (YYYY-MM-DDTHH:MM:SS). */
+  fechaPublicacionHasta?: string;
+  /** Límite inferior del rango de fecha de cierre (YYYY-MM-DDTHH:MM:SS). */
+  fechaCierreDesde?: string;
+  /** Límite superior del rango de fecha de cierre (YYYY-MM-DDTHH:MM:SS). */
+  fechaCierreHasta?: string;
 }
 
-/** Etiquetas en español para cada rango de días */
-export const DATE_RANGE_LABELS: Record<DateRangeKey, string> = {
-  today: "Hoy",
-  under_7: "< 7 días",
-  "7_15": "7-15 días",
-  over_15: ">15 días",
-};
-
-/** Valores iniciales: búsqueda vacía, sin tipos seleccionados (muestra todos), sin filtro por plazo */
+/** Valores iniciales: búsqueda vacía, sin tipos ni fechas seleccionadas. */
 export const DEFAULT_FILTERS: FiltersState = {
   search: "",
   tenderTypes: [],
-  dateRanges: [],
   familia: 0,
   subfamilia: 0,
   fechaPublicacionDesde: "",

@@ -73,13 +73,11 @@ export function Filters({
   const hasActiveFilters =
     value.search !== "" ||
     value.tenderTypes.length > 0 ||
-    value.dateRanges.length > 0 ||
     hasActiveDateFilter;
 
   const activeCount =
     (value.search !== "" ? 1 : 0) +
     value.tenderTypes.length +
-    value.dateRanges.length +
     (hasActiveDateFilter ? 1 : 0);
 
   // ── Mobile derived ──
