@@ -26,7 +26,7 @@ export async function getEmailConfig(): Promise<EmailConfig[]> {
  * @returns El `EmailConfig` creado por el backend.
  */
 export async function postEmailConfig(email: EmailConfig): Promise<EmailConfig> {
-  return api.post<EmailConfig>(EMAIL_PATH, { email: email.direccion });
+  return api.post<EmailConfig>(EMAIL_PATH, { direccionEmail: email.direccion });
 }
 
 /**
