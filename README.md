@@ -13,7 +13,6 @@ Dashboard web para el monitoreo, búsqueda y notificación de licitaciones públ
 - [Instalación y desarrollo local](#instalación-y-desarrollo-local)
 - [Scripts disponibles](#scripts-disponibles)
 - [Endpoints del backend](#endpoints-del-backend)
-- [Documentación técnica](#documentación-técnica)
 
 ---
 
@@ -50,33 +49,74 @@ Sus funcionalidades principales son:
 
 ```
 src/
-├── main.tsx                     # Punto de entrada
-├── styles/                      # Estilos globales + Tailwind
-├── api/                         # Cliente HTTP y servicios del backend
-│   ├── client.ts                # Wrapper de fetch
-│   ├── licitaciones.ts          # Licitaciones + mapeo de datos
-│   ├── familias.ts              # Familias y subfamilias
-│   ├── config.ts                # Preferencias del usuario
-│   ├── emailConfig.ts           # Gestión de emails
-│   ├── notificaciones.ts        # Notificaciones
-│   └── types.ts                 # Tipos de respuestas
+├── main.tsx                          # Punto de entrada
+├── vite-env.d.ts                     # Declaración de la global __API_BASE_URL__
+├── styles/
+│   └── index.css                     # Estilos globales + directivas Tailwind
+├── api/                              # Cliente HTTP y servicios del backend
+│   ├── index.ts                      # Barrel — re-exporta todos los servicios y tipos
+│   ├── client.ts                     # Cliente HTTP base (wrapper de fetch)
+│   ├── types.ts                      # Tipos de respuestas del backend
+│   ├── licitaciones.ts               # Licitaciones + mapeo de datos
+│   ├── familias.ts                   # Familias y subfamilias
+│   ├── config.ts                     # Preferencias del usuario (FamiliaConfig)
+│   ├── emailConfig.ts                # Gestión de emails
+│   └── notificaciones.ts             # Notificaciones (resumen y detalle)
 └── app/
-    ├── App.tsx                  # Raíz + AppProvider
-    ├── pages/MainPage.tsx       # Página principal
+    ├── App.tsx                       # Raíz de la aplicación + AppProvider
+    ├── index.ts                      # Barrel del módulo app
+    ├── pages/
+    │   └── MainPage.tsx              # Página principal: orquesta layout y lógica
     ├── components/
-    │   ├── layout/              # Header, Sidebar, FiltrosLicitaciones, NotificacionesEmail
-    │   └── ui/                  # BidCardSkeleton, EmptyState, ErrorMessage, MiniCalendar, icons, inputs
-    ├── features/
-    │   ├── bids/                # BidCard + tipos Bid
-    │   ├── filters/             # Filters, DatePill, TipoPill, PlazoDropdown + tipos
-    │   └── notifications/       # NotificationPanel, Header, List, Item, Detail + hook
-    └── shared/
-        ├── context/             # AppContext (estado global)
-        ├── hooks/               # useLicitaciones, useFamilias, useEmailConfig
-        └── utils/               # dateHelpers
+    │   ├── layout/                   # Componentes de estructura
+    │   │   ├── Header.tsx
+    │   │   ├── Sidebar.tsx
+    │   │   ├── FiltrosLicitaciones.tsx
+    │   │   ├── NotificacionesEmail.tsx
+    │   │   └── index.ts
+    │   └── ui/                       # Componentes reutilizables de UI
+    │       ├── BidCardSkeleton.tsx
+    │       ├── EmptyState.tsx
+    │       ├── ErrorMessage.tsx
+    │       ├── MiniCalendar.tsx
+    │       ├── icons/index.tsx        # Iconos SVG como componentes React
+    │       ├── inputs/FilterChip.tsx   # Chip togglable para filtros
+    │       └── index.ts
+    ├── features/                      # Módulos organizados por dominio
+    │   ├── bids/
+    │   │   ├── components/BidCard.tsx  # Tarjeta individual de licitación
+    │   │   ├── types/Bid.ts           # Tipos Bid, BidFamilia, BidSubfamilia
+    │   │   └── index.ts
+    │   ├── filters/
+    │   │   ├── components/
+    │   │   │   ├── Filters.tsx         # Barra de filtros principal
+    │   │   │   ├── DatePill.tsx        # Pill de fecha con popover
+    │   │   │   ├── TipoPill.tsx        # Pill de tipo de licitación
+    │   │   │   ├── PlazoDropdown.tsx   # Dropdown de plazo de urgencia
+    │   │   │   └── PopoverActions.tsx  # Acciones de popover (limpiar/aplicar)
+    │   │   ├── types/filters.ts       # FiltersState y constantes
+    │   │   └── index.ts
+    │   └── notifications/
+    │       ├── components/
+    │       │   ├── NotificationPanel.tsx
+    │       │   ├── NotificationHeader.tsx
+    │       │   ├── NotificationList.tsx
+    │       │   ├── NotificationItem.tsx
+    │       │   ├── NotificationDetail.tsx
+    │       │   └── StatusBadge.tsx
+    │       ├── hooks/useNotificaciones.ts  # Hook de notificaciones + lectura
+    │       └── index.ts
+    └── shared/                        # Código compartido entre features
+        ├── context/AppContext.tsx      # Estado global (filtros, sidebar, familia)
+        ├── hooks/
+        │   ├── useLicitaciones.ts
+        │   ├── useFamilias.ts
+        │   ├── useEmailConfig.ts
+        │   └── index.ts
+        ├── types/index.ts
+        ├── utils/dateHelpers.ts        # Helpers de formateo de fechas
+        └── index.ts
 ```
-
-> Para el detalle de cada módulo, componente y hook, ver [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -149,7 +189,7 @@ La URL base se configura mediante la variable `API_BASE_URL`.
 |---|---|---|
 | `GET` | `/familias` | Lista de familias disponibles |
 | `GET` | `/subfamilias/familia/{fami_cod}` | Subfamilias de una familia |
-| `GET` | `/licitaciones` | Licitaciones (query params: `familiaCod`, `subfamiliaCod`) |
+| `GET` | `/licitaciones` | Licitaciones (query params: `familiaCod`, `subfamiliaCod`, `fechaPublicacionDesde`, `fechaPublicacionHasta`, `fechaCierreDesde`, `fechaCierreHasta`) |
 | `GET` | `/licitaciones/{id}` | Detalle de una licitación |
 | `GET` | `/config` | Preferencia de familia/subfamilia del usuario |
 | `PUT` | `/config` | Guardar preferencia de familia/subfamilia |
@@ -159,10 +199,4 @@ La URL base se configura mediante la variable `API_BASE_URL`.
 | `GET` | `/notificacion` | Notificaciones recientes (query param: `fechaEjecucion`) |
 | `GET` | `/notificacion/{id}` | Detalle de una notificación |
 
----
 
-## Documentación técnica
-
-Para información detallada sobre la arquitectura, módulos, componentes, hooks y flujo de datos, ver:
-
-📄 **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
