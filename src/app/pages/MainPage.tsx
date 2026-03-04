@@ -1,22 +1,29 @@
 import { useMemo, useState } from "react";
-import { useAppContext } from "../hooks/useAppContext";
-import { useLicitaciones } from "../hooks/useLicitaciones";
-import type { Bid } from "../types/Bid";
-import Header from "../components/header";
-import Sidebar from "../components/Sidebar";
-import { BidCard } from "../components/BidCard";
-import { Filters } from "../components/Filters";
-import { BidCardSkeleton } from "../components/ui/BidCardSkeleton";
-import { ErrorMessage } from "../components/ui/ErrorMessage";
-import { EmptyState } from "../components/ui/EmptyState";
+import type { Bid } from "../features/bids/types/Bid";
+import { default as Header } from "../components/layout/Header";
+import { default as Sidebar } from "../components/layout/Sidebar";
+import { BidCardSkeleton, ErrorMessage, EmptyState } from "../components/ui";
+import { useAppContext, useLicitaciones, BidCard, Filters } from "../";
 
 /** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
 function normalizeTipo(tipo: string): string {
-  return tipo.replace(/\d+/g, "").replace(/\//g, "").replace(/\s+/g, " ").trim();
+  return tipo
+    .replace(/\d+/g, "")
+    .replace(/\//g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export default function MainPage() {
-  const { sidebarOpen, setSidebarOpen, filters, setFilters, familiaCod, subfamiliaCod, configLoaded } = useAppContext();
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    filters,
+    setFilters,
+    familiaCod,
+    subfamiliaCod,
+    configLoaded,
+  } = useAppContext();
   const { licitaciones, loading, error } = useLicitaciones(
     {
       familiaCod: familiaCod ? Number(familiaCod) : undefined,
@@ -72,14 +79,24 @@ export default function MainPage() {
         ? bid.fecha_publicacion
         : `${bid.fecha_publicacion}T00:00:00`;
       const matchesFechaPublicacion =
-        (!filters.fechaPublicacionDesde || pubDateNorm >= filters.fechaPublicacionDesde) &&
-        (!filters.fechaPublicacionHasta || pubDateNorm <= filters.fechaPublicacionHasta);
+        (!filters.fechaPublicacionDesde ||
+          pubDateNorm >= filters.fechaPublicacionDesde) &&
+        (!filters.fechaPublicacionHasta ||
+          pubDateNorm <= filters.fechaPublicacionHasta);
 
       const matchesFechaCierre =
-        (!filters.fechaCierreDesde || bid.fecha_cierre >= filters.fechaCierreDesde) &&
-        (!filters.fechaCierreHasta || bid.fecha_cierre <= filters.fechaCierreHasta);
+        (!filters.fechaCierreDesde ||
+          bid.fecha_cierre >= filters.fechaCierreDesde) &&
+        (!filters.fechaCierreHasta ||
+          bid.fecha_cierre <= filters.fechaCierreHasta);
 
-      return matchesSearch && matchesType && matchesTime && matchesFechaPublicacion && matchesFechaCierre;
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesTime &&
+        matchesFechaPublicacion &&
+        matchesFechaCierre
+      );
     });
   }, [licitaciones, filters]);
 

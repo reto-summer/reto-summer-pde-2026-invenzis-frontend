@@ -3,8 +3,12 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { getEmailConfig, postEmailConfig, deleteEmailConfig } from "../../api/emailConfig";
-import type { EmailConfig } from "../../api/types";
+import {
+  getEmailConfig,
+  postEmailConfig,
+  deleteEmailConfig,
+} from "../../../api/emailConfig";
+import type { EmailConfig } from "../../../api/types";
 
 export interface UseEmailConfigResult {
   emails: EmailConfig[];
@@ -39,27 +43,35 @@ export function useEmailConfig(): UseEmailConfigResult {
     fetchEmails();
   }, [fetchEmails]);
 
-  const addEmail = useCallback(async (direccion: string) => {
-    setError(null);
-    try {
-      await postEmailConfig({ direccion });
-      await fetchEmails();
-    } catch (e) {
-      console.error("addEmail:", e);
-      setError("No se pudo agregar el email. Verificá que sea válido e intentá de nuevo.");
-    }
-  }, [fetchEmails]);
+  const addEmail = useCallback(
+    async (direccion: string) => {
+      setError(null);
+      try {
+        await postEmailConfig({ direccion });
+        await fetchEmails();
+      } catch (e) {
+        console.error("addEmail:", e);
+        setError(
+          "No se pudo agregar el email. Verificá que sea válido e intentá de nuevo.",
+        );
+      }
+    },
+    [fetchEmails],
+  );
 
-  const removeEmail = useCallback(async (direccion: string) => {
-    setError(null);
-    try {
-      await deleteEmailConfig(direccion);
-      await fetchEmails();
-    } catch (e) {
-      console.error("removeEmail:", e);
-      setError("No se pudo eliminar el email. Intentá de nuevo.");
-    }
-  }, [fetchEmails]);
+  const removeEmail = useCallback(
+    async (direccion: string) => {
+      setError(null);
+      try {
+        await deleteEmailConfig(direccion);
+        await fetchEmails();
+      } catch (e) {
+        console.error("removeEmail:", e);
+        setError("No se pudo eliminar el email. Intentá de nuevo.");
+      }
+    },
+    [fetchEmails],
+  );
 
   return {
     emails,

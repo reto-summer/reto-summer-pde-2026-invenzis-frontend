@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
-import { useFamilias } from "../hooks/useFamilias";
-import { useAppContext } from "../context/AppContext";
+import { useFamilias } from "../../shared/hooks/useFamilias";
+import { useAppContext } from "../../shared/context/AppContext";
 
 interface FiltrosLicitacionesProps {
   onClose?: () => void;

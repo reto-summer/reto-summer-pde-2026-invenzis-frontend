@@ -3,8 +3,14 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { getNotificaciones, getNotificacion } from "../../api/notificaciones";
-import type { NotificacionResumen, NotificacionDetalle } from "../../api/types";
+import {
+  getNotificaciones,
+  getNotificacion,
+} from "../../../../api/notificaciones";
+import type {
+  NotificacionResumen,
+  NotificacionDetalle,
+} from "../../../../api/types";
 
 const LS_KEY = "notificaciones_leidas";
 
@@ -38,8 +44,11 @@ export interface UseNotificacionesResult {
 }
 
 export function useNotificaciones(): UseNotificacionesResult {
-  const [notificaciones, setNotificaciones] = useState<NotificacionResumen[]>([]);
-  const [detalleActual, setDetalleActual] = useState<NotificacionDetalle | null>(null);
+  const [notificaciones, setNotificaciones] = useState<NotificacionResumen[]>(
+    [],
+  );
+  const [detalleActual, setDetalleActual] =
+    useState<NotificacionDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,20 +96,25 @@ export function useNotificaciones(): UseNotificacionesResult {
 
   const unreadCount = notificaciones.filter((n) => !readIds.has(n.id)).length;
 
-  const fetchDetalle = useCallback(async (id: number) => {
-    markAsRead(id);
-    setLoadingDetalle(true);
-    setError(null);
-    try {
-      const data = await getNotificacion(id);
-      setDetalleActual(data);
-    } catch (e) {
-      console.error("fetchDetalle:", e);
-      setError("No se pudo cargar el detalle de la notificación. Intenta de nuevo.");
-    } finally {
-      setLoadingDetalle(false);
-    }
-  }, [markAsRead]);
+  const fetchDetalle = useCallback(
+    async (id: number) => {
+      markAsRead(id);
+      setLoadingDetalle(true);
+      setError(null);
+      try {
+        const data = await getNotificacion(id);
+        setDetalleActual(data);
+      } catch (e) {
+        console.error("fetchDetalle:", e);
+        setError(
+          "No se pudo cargar el detalle de la notificación. Intenta de nuevo.",
+        );
+      } finally {
+        setLoadingDetalle(false);
+      }
+    },
+    [markAsRead],
+  );
 
   const clearDetalle = useCallback(() => {
     setDetalleActual(null);

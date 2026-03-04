@@ -1,8 +1,14 @@
-import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import type { ReactNode } from "react";
-import type { FiltersState } from "../types/filters";
-import { DEFAULT_FILTERS } from "../types/filters";
-import { getConfig, putConfig } from "../../api/config";
+import type { FiltersState } from "../../features/filters/types/filters";
+import { DEFAULT_FILTERS } from "../../features/filters/types/filters";
+import { getConfig, putConfig } from "../../../api/config";
 
 interface AppState {
   filters: FiltersState;
@@ -17,7 +23,10 @@ interface AppState {
 interface AppContextType extends AppState {
   setFilters: (filters: FiltersState) => void;
   setSidebarOpen: (open: boolean) => void;
-  setFiltrosCascada: (familiaCod: string | null, subfamiliaCod: string | null) => void;
+  setFiltrosCascada: (
+    familiaCod: string | null,
+    subfamiliaCod: string | null,
+  ) => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -31,22 +40,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Cargar selección guardada al iniciar
   useEffect(() => {
-    getConfig().then((config) => {
-      if (config.familiaCod) setFamiliaCodState(String(config.familiaCod));
-      if (config.subfamiliaCod) setSubfamiliaCod(String(config.subfamiliaCod));
-    }).catch(() => {}).finally(() => {
-      setConfigLoaded(true);
-    });
+    getConfig()
+      .then((config) => {
+        if (config.familiaCod) setFamiliaCodState(String(config.familiaCod));
+        if (config.subfamiliaCod)
+          setSubfamiliaCod(String(config.subfamiliaCod));
+      })
+      .catch(() => {})
+      .finally(() => {
+        setConfigLoaded(true);
+      });
   }, []);
 
-  const setFiltrosCascada = useCallback((fam: string | null, sub: string | null) => {
-    setFamiliaCodState(fam);
-    setSubfamiliaCod(sub);
-    putConfig({
-      familiaCod: fam ? Number(fam) : null,
-      subfamiliaCod: sub ? Number(sub) : null,
-    }).catch(() => {});
-  }, []);
+  const setFiltrosCascada = useCallback(
+    (fam: string | null, sub: string | null) => {
+      setFamiliaCodState(fam);
+      setSubfamiliaCod(sub);
+      putConfig({
+        familiaCod: fam ? Number(fam) : null,
+        subfamiliaCod: sub ? Number(sub) : null,
+      }).catch(() => {});
+    },
+    [],
+  );
 
   return (
     <AppContext.Provider

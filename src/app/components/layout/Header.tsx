@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { NotificationPanel } from "./NotificationPanel";
-import { useNotificaciones } from "../hooks/useNotificaciones";
+import { NotificationPanel } from "../..";
+import { useNotificaciones } from "../../features/notifications/hooks";
 
 interface HeaderProps {
   title?: string;

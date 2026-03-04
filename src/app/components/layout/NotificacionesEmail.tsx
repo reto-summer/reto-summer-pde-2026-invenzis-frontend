@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useEmailConfig } from "../hooks/useEmailConfig";
+import { useEmailConfig } from "../../shared/hooks/useEmailConfig";
 
 export default function NotificacionesEmail() {
   const [mailInput, setMailInput] = useState("");
@@ -32,8 +32,8 @@ export default function NotificacionesEmail() {
             Notificaciones por Email
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Agregue direcciones de correo electrónico para recibir notificaciones
-            diarias de novedades.
+            Agregue direcciones de correo electrónico para recibir
+            notificaciones diarias de novedades.
           </p>
         </div>
         <svg
