@@ -22,7 +22,7 @@ import {
 import type { ReactNode } from "react";
 import type { FiltersState } from "../../features/filters/types/filters";
 import { DEFAULT_FILTERS } from "../../features/filters/types/filters";
-import { getConfig, putConfig } from "../../../api/config";
+import { getConfig, putConfig } from "../../../api";
 
 /** Estado global compartido de la aplicación. */
 interface AppState {

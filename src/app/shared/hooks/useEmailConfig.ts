@@ -10,8 +10,8 @@ import {
   getEmailConfig,
   postEmailConfig,
   deleteEmailConfig,
-} from "../../../api/emailConfig";
-import type { EmailConfig } from "../../../api/types";
+  type EmailConfig,
+} from "../../../api";
 
 /** Resultado expuesto por `useEmailConfig`. */
 export interface UseEmailConfigResult {

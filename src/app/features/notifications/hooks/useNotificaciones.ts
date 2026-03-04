@@ -10,11 +10,9 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getNotificaciones,
   getNotificacion,
-} from "../../../../api/notificaciones";
-import type {
-  NotificacionResumen,
-  NotificacionDetalle,
-} from "../../../../api/types";
+  type NotificacionResumen,
+  type NotificacionDetalle,
+} from "../../../../api";
 
 const LS_KEY = "notificaciones_leidas";
 

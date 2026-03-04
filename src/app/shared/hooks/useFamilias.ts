@@ -7,8 +7,12 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { getFamilias, getSubfamiliasPorFamilia } from "../../../api/familias";
-import type { Familia, Subfamilia } from "../../../api/types";
+import {
+  getFamilias,
+  getSubfamiliasPorFamilia,
+  type Familia,
+  type Subfamilia,
+} from "../../../api";
 
 /** Resultado expuesto por `useFamilias`. */
 export interface UseFamiliasResult {
