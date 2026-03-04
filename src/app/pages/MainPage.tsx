@@ -91,7 +91,12 @@ export default function MainPage() {
         (!filters.fechaCierreHasta ||
           bid.fecha_cierre <= filters.fechaCierreHasta);
 
-      return matchesSearch && matchesType && matchesFechaPublicacion && matchesFechaCierre;
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesFechaPublicacion &&
+        matchesFechaCierre
+      );
     });
   }, [licitaciones, filters]);
 
@@ -124,7 +129,7 @@ export default function MainPage() {
 
       {/* Main content — shifts right when sidebar is open */}
       <div
-        className={`transition-[margin] duration-300 ${sidebarOpen ? "sm:ml-[400px]" : "ml-0"}`}
+        className={`transition-[margin] duration-300 ${sidebarOpen ? "`sm:ml-100" : "ml-0"}`}
       >
         {/* Fixed header */}
         <Header
