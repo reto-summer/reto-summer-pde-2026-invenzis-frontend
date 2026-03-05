@@ -1,16 +1,30 @@
-import { useMemo } from "react";
-import { useAppContext } from "../hooks/useAppContext";
-import { useLicitaciones } from "../hooks/useLicitaciones";
-import type { Bid } from "../types/Bid";
-import Header from "../components/header";
-import Sidebar from "../components/Sidebar";
-import { BidCard } from "../components/BidCard";
-import { Filters } from "../components/Filters";
-import { BidCardSkeleton } from "../components/ui/BidCardSkeleton";
-import { ErrorMessage } from "../components/ui/ErrorMessage";
-import { EmptyState } from "../components/ui/EmptyState";
+/**
+ * Página principal del Radar de Licitaciones.
+ *
+ * Orquesta la carga de licitaciones, la aplicación de filtros en el cliente
+ * y la separación entre licitaciones vigentes y vencidas. También gestiona
+ * la visibilidad del sidebar de configuración.
+ *
+ * Pipeline de filtrado (client-side sobre el array completo de licitaciones):
+ *   1. Búsqueda libre en título y descripción.
+ *   2. Filtro por tipo de licitación.
+ *   3. Rango de fecha de publicación (inclusive en ambos extremos).
+ *   4. Rango de fecha de cierre (inclusive en ambos extremos).
+ *   5. Separación vigentes / vencidas según `fecha_cierre` vs. `Date.now()`.
+ */
 
-/** Elimina dígitos del tipo de licitación para agrupar variantes. Ej: "Licitación Pública 001" → "Licitación Pública" */
+import { useMemo, useState } from "react";
+import type { Bid } from "../features/bids/types/Bid";
+import { default as Header } from "../components/layout/Header";
+import { default as Sidebar } from "../components/layout/Sidebar";
+import { BidCardSkeleton, ErrorMessage, EmptyState } from "../components/ui";
+import { useAppContext, useLicitaciones, BidCard, Filters } from "../";
+
+/**
+ * Normaliza el tipo de licitación eliminando dígitos y caracteres especiales
+ * para agrupar variantes bajo un mismo nombre.
+ * Ej: `"Licitación Pública 001"` → `"Licitación Pública"`
+ */
 function normalizeTipo(tipo: string): string {
   return tipo
     .replace(/\d+/g, "")
@@ -36,6 +50,7 @@ export default function MainPage() {
     },
     configLoaded,
   );
+  const [showExpired, setShowExpired] = useState(false);
 
   const availableTipos = useMemo(() => {
     const set = new Set<string>();
@@ -58,30 +73,17 @@ export default function MainPage() {
         filters.tenderTypes.length === 0 ||
         filters.tenderTypes.includes(normalizeTipo(bid.tipoLicitacion ?? ""));
 
-      const hours =
-        (new Date(bid.fecha_cierre).getTime() - Date.now()) / (1000 * 60 * 60);
-      const matchesTime =
-        filters.dateRanges.length === 0 ||
-        filters.dateRanges.some((range) => {
-          switch (range) {
-            case "today":
-              return hours >= 0 && hours < 24;
-            case "under_7":
-              return hours >= 0 && hours <= 168;
-            case "7_15":
-              return hours > 168 && hours <= 360;
-            case "over_15":
-              return hours > 360;
-            default:
-              return false;
-          }
-        });
+      // Normalize fecha_publicacion: backend may return "YYYY-MM-DD" without time,
+      // which compares as less-than "YYYY-MM-DDT..." strings, excluding the start day.
+      const pubDateNorm = bid.fecha_publicacion?.includes("T")
+        ? bid.fecha_publicacion
+        : `${bid.fecha_publicacion}T00:00:00`;
 
       const matchesFechaPublicacion =
         (!filters.fechaPublicacionDesde ||
-          bid.fecha_publicacion >= filters.fechaPublicacionDesde) &&
+          pubDateNorm >= filters.fechaPublicacionDesde) &&
         (!filters.fechaPublicacionHasta ||
-          bid.fecha_publicacion <= filters.fechaPublicacionHasta);
+          pubDateNorm <= filters.fechaPublicacionHasta);
 
       const matchesFechaCierre =
         (!filters.fechaCierreDesde ||
@@ -92,12 +94,33 @@ export default function MainPage() {
       return (
         matchesSearch &&
         matchesType &&
-        matchesTime &&
         matchesFechaPublicacion &&
         matchesFechaCierre
       );
     });
   }, [licitaciones, filters]);
+
+  const { visibleBids, expiredCount } = useMemo(() => {
+    const now = Date.now();
+    const isExpired = (bid: Bid) => {
+      const closeTs = new Date(bid.fecha_cierre).getTime();
+      if (Number.isNaN(closeTs)) return false;
+      return closeTs < now;
+    };
+
+    const expired = filteredBids.filter(isExpired);
+    if (showExpired) {
+      return {
+        visibleBids: expired,
+        expiredCount: expired.length,
+      };
+    }
+
+    return {
+      visibleBids: filteredBids.filter((bid) => !isExpired(bid)),
+      expiredCount: expired.length,
+    };
+  }, [filteredBids, showExpired]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -110,7 +133,7 @@ export default function MainPage() {
       >
         {/* Fixed header */}
         <Header
-          subtitle={`${filteredBids.length} licitaciones disponibles`}
+          subtitle={`${visibleBids.length} licitaciones disponibles`}
           sidebarOpen={sidebarOpen}
           onSettingsClick={() => setSidebarOpen(true)}
         />
@@ -123,6 +146,9 @@ export default function MainPage() {
               value={filters}
               onChange={setFilters}
               availableTipos={availableTipos}
+              expiredCount={expiredCount}
+              showExpired={showExpired}
+              onToggleExpired={() => setShowExpired((prev) => !prev)}
             />
           </div>
 
@@ -134,13 +160,13 @@ export default function MainPage() {
               ))
             ) : error ? (
               <ErrorMessage message={error} />
-            ) : filteredBids.length === 0 ? (
+            ) : visibleBids.length === 0 ? (
               <EmptyState
                 title="No hay licitaciones disponibles"
                 description="No se encontraron licitaciones en este momento."
               />
             ) : (
-              filteredBids.map((bid: Bid) => (
+              visibleBids.map((bid: Bid) => (
                 <BidCard key={bid.id_licitacion} bid={bid} />
               ))
             )}

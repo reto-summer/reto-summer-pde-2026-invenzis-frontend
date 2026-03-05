@@ -1,5 +1,13 @@
+/**
+ * Componente ErrorMessage — Estado de error con mensaje y botón opcional de reintento.
+ * Ocupa el espacio de la lista de resultados para dar feedback visual prominente.
+ */
+
+/** Props del componente ErrorMessage. */
 interface ErrorMessageProps {
+  /** Mensaje de error a mostrar al usuario. */
   message: string;
+  /** Si se provee, muestra el botón "Reintentar" que invoca este callback. */
   onRetry?: () => void;
 }
 

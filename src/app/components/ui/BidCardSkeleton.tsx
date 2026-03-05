@@ -1,3 +1,7 @@
+/**
+ * Componente BidCardSkeleton — Placeholder animado mientras cargan las licitaciones.
+ * Replica la estructura visual de `BidCard` usando bloques con `animate-pulse`.
+ */
 export function BidCardSkeleton() {
   return (
     <div className="block bg-white border border-slate-200 rounded-lg p-4 animate-pulse">
